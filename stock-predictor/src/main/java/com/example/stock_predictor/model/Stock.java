@@ -1,34 +1,32 @@
 package com.example.stock_predictor.model;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "stock")
+@Table(name = "stocks")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@AllArgsConstructor
+@Builder
 public class Stock {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long stockId;
 
-    @Column(nullable = false,unique = true,length = 20)
+    @Column(nullable = false, length = 20, unique = true)
     private String ticker;
 
     @Column(nullable = false, length = 100)
     private String name;
 
-    @Column(nullable = false,length = 50)
-    private String market;
+    @Column(nullable = false, length = 20)
+    private String market; // KOSPI, KOSDAQ
 
-    public Stock(Long id, String ticker, String name, String market) {
-        this.id = id;
-        this.ticker = ticker;
-        this.name = name;
-        this.market = market;
-    }
+    @Column(length = 100)
+    private String sector;
+
+    private LocalDateTime createdAt;
 }
