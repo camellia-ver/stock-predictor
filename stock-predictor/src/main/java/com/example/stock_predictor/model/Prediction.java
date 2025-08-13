@@ -3,6 +3,7 @@ package com.example.stock_predictor.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -28,8 +29,8 @@ public class Prediction {
     @Column(length = 50)
     private String modelName;
 
-    private Double upProb;
-    private Double downProb;
+    private BigDecimal upProb;
+    private BigDecimal downProb;
 
     private LocalDateTime createdAt;
 }

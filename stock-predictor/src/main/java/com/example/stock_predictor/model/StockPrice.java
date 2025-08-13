@@ -3,6 +3,7 @@ package com.example.stock_predictor.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -25,10 +26,10 @@ public class StockPrice {
     @Column(nullable = false)
     private LocalDate date;
 
-    private Double openPrice;
-    private Double closePrice;
-    private Double highPrice;
-    private Double lowPrice;
+    private BigDecimal openPrice;
+    private BigDecimal closePrice;
+    private BigDecimal highPrice;
+    private BigDecimal lowPrice;
 
     private Long volume;
 

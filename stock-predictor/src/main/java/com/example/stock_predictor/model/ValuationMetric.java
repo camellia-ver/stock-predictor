@@ -3,6 +3,7 @@ package com.example.stock_predictor.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -24,12 +25,12 @@ public class ValuationMetric {
 
     private LocalDate date;
 
-    private Double per;
-    private Double pbr;
-    private Double roe;
-    private Double eps;
-    private Double bps;
-    private Double dividendYield;
+    private BigDecimal per;
+    private BigDecimal pbr;
+    private BigDecimal roe;
+    private BigDecimal eps;
+    private BigDecimal bps;
+    private BigDecimal dividendYield;
 
     @Column(length = 20)
     private String source;
