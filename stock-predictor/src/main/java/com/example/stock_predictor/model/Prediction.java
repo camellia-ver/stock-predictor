@@ -3,13 +3,13 @@ package com.example.stock_predictor.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "predictions")
 @Getter
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 public class Prediction {
@@ -22,8 +22,8 @@ public class Prediction {
     @JoinColumn(name = "stock_id", nullable = false)
     private Stock stock;
 
-    private java.sql.Date predictionDate;
-    private java.sql.Date targetDate;
+    private LocalDate predictionDate;
+    private LocalDate targetDate;
 
     @Column(length = 50)
     private String modelName;

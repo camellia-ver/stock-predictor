@@ -3,13 +3,14 @@ package com.example.stock_predictor.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "stock_prices", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"stock_id", "date"})
 })
 @Getter
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 public class StockPrice {
@@ -22,7 +23,7 @@ public class StockPrice {
     private Stock stock;
 
     @Column(nullable = false)
-    private java.sql.Date date;
+    private LocalDate date;
 
     private Double openPrice;
     private Double closePrice;

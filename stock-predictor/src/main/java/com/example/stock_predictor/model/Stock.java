@@ -8,8 +8,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "stocks")
 @Getter
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 public class Stock {

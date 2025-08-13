@@ -8,12 +8,10 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "news_articles")
 @Getter
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 public class NewsArticle {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long newsId;

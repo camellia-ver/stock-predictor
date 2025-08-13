@@ -8,8 +8,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
-@Getter @Setter
-@NoArgsConstructor
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 public class User {
