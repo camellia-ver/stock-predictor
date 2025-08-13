@@ -6,26 +6,30 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "favorites", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"user_id", "stock_id"})
-})
-@Getter @Setter
+@Table(name = "predictions")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Favorite {
+public class Prediction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long favId;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private Long predId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stock_id", nullable = false)
     private Stock stock;
+
+    private java.sql.Date predictionDate;
+    private java.sql.Date targetDate;
+
+    @Column(length = 50)
+    private String modelName;
+
+    private Double upProb;
+    private Double downProb;
 
     private LocalDateTime createdAt;
 }

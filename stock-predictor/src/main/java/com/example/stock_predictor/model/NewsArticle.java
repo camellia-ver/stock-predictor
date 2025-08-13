@@ -6,28 +6,37 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "notes")
-@Getter @Setter
+@Table(name = "news_articles")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Note {
+public class NewsArticle {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long noteId;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private Long newsId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stock_id", nullable = false)
     private Stock stock;
 
+    @Column(length = 255)
+    private String title;
+
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    @Column(length = 500)
+    private String url;
+
+    @Column(length = 100)
+    private String publisher;
+
+    private LocalDateTime publishedAt;
+
+    @Column(length = 20)
+    private String source;
 }
+
