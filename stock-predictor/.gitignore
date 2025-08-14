@@ -205,4 +205,6 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/windows,java,intellij
+
+# API 키 및 민감한 정보가 포함된 파일
 application-DB.properties
