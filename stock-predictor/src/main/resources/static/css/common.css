@@ -1,0 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+
+body {
+    font-family: 'Noto Sans', 'Noto Sans KR', sans-serif;
+    background: linear-gradient(135deg, #0d6efd, #6610f2);
+    color: white;
+}
+
+/* 한글만 Noto Sans KR로 강제 */
+html:lang(ko) body {
+    font-family: 'Noto Sans KR', 'Noto Sans', sans-serif;
+}
