@@ -1,0 +1,50 @@
+/* 메모 카드 스타일 개선 */
+.card.memo-card {
+    background: rgba(0, 0, 0, 0.6); /* 반투명 검정 */
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 1rem;
+    color: #f1f1f1;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    padding: 1rem;
+}
+
+.card.memo-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+
+/* 제목은 밝은 하늘색 */
+.card.memo-card .card-title {
+    color: #4da8ff;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+/* 날짜는 더 흐리게 */
+.card.memo-card .card-subtitle {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+}
+
+/* 본문은 회색톤 + 3줄만 표시 */
+.card.memo-card .card-text {
+    color: #e0e0e0;
+    font-size: 0.95rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;  /* 3줄 제한 */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* 버튼은 조금 더 강조 */
+.card.memo-card .btn-outline-primary {
+    border-color: #4da8ff;
+    color: #4da8ff;
+    font-weight: 500;
+}
+
+.card.memo-card .btn-outline-primary:hover {
+    background: linear-gradient(135deg, #0d6efd, #6610f2);
+    color: #fff !important;
+    border-color: transparent;
+}
