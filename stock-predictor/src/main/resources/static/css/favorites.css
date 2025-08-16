@@ -1,0 +1,23 @@
+/* 종목명 색상 개선 */
+.table td.fw-bold {
+    color: #4da8ff !important; /* 밝은 하늘색 */
+}
+
+/* 메모 버튼 시인성 강화 */
+.btn-outline-primary {
+    color: #ffffff !important;
+    border-color: #4da8ff !important;
+}
+
+.btn-outline-primary:hover {
+    background: linear-gradient(135deg, #0d6efd, #6610f2);
+    color: #fff !important;
+    border-color: transparent !important;
+}
+
+/* 표 헤더 더 명확하게 */
+.table-dark thead th {
+    background-color: rgba(255,255,255,0.05);
+    color: #0d6efd;
+    font-weight: 600;
+}
