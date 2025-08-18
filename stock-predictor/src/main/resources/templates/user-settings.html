@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <meta name="description" content="Stock Predictor 회원 정보 & 즐겨찾기 관리" />
+    <meta name="keywords" content="주식, 회원정보, 즐겨찾기, Stock Predictor" />
+    <meta name="author" content="Jo YoungRan" />
+    <title>내 정보 - Stock Predictor</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/common.css" />
+    <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<header>
+    <div th:replace="~{fragments/nav :: nav}"></div>
+</header>
+
+<!-- MAIN CONTENT -->
+<main class="container py-4">
+
+    <div class="row g-4">
+        <!-- 회원 정보 수정 -->
+        <section class="col-lg-6">
+            <h2 class="mb-3">👤 회원 정보 수정</h2>
+            <div class="card shadow-sm p-3">
+                <form>
+                    <div class="mb-3">
+                        <label for="username" class="form-label">사용자명</label>
+                        <input type="text" class="form-control" id="username" placeholder="사용자명을 입력하세요">
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">이메일</label>
+                        <input type="email" class="form-control" id="email" placeholder="example@domain.com">
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">비밀번호</label>
+                        <input type="password" class="form-control" id="password" placeholder="새 비밀번호">
+                    </div>
+                    <button type="submit" class="btn btn-gradient">저장</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- 즐겨찾기 종목 관리 -->
+        <section class="col-lg-6">
+            <h2 class="mb-3">⭐ 즐겨찾기 종목 관리</h2>
+            <div class="card shadow-sm p-3">
+                <ul class="list-group list-group-flush mb-3">
+                    <li class="list-group-item bg-transparent text-white d-flex justify-content-between align-items-center">
+                        삼성전자
+                        <button class="btn btn-sm btn-outline-danger">제거</button>
+                    </li>
+                    <li class="list-group-item bg-transparent text-white d-flex justify-content-between align-items-center">
+                        카카오
+                        <button class="btn btn-sm btn-outline-danger">제거</button>
+                    </li>
+                </ul>
+                <form class="d-flex gap-2">
+                    <input type="text" class="form-control" placeholder="종목 추가">
+                    <button type="submit" class="btn btn-gradient">추가</button>
+                </form>
+            </div>
+        </section>
+    </div>
+
+</main>
+
+<!-- FOOTER -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

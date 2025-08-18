@@ -4,7 +4,8 @@
         <a class="navbar-brand text-primary fw-bold" href="/">Stock Predictor</a>
 
         <form class="d-flex ms-auto me-3" role="search">
-            <input class="form-control" type="search" placeholder="종목 검색" aria-label="Search">
+            <input class="form-control me-2" type="search" name="query" placeholder="종목 검색" aria-label="Search">
+            <button class="btn btn-outline-primary" type="submit">검색</button>
         </form>
 
         <ul class="navbar-nav">
@@ -15,10 +16,10 @@
                 <a class="nav-link" href="/memo">메모</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/profile">내 정보</a>
+                <a class="nav-link" href="/setting">내 정보</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-danger" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">로그아웃</a>
+                <a class="nav-link text-danger" href="/logout" data-bs-toggle="modal" data-bs-target="#logoutModal">로그아웃</a>
             </li>
         </ul>
     </div>

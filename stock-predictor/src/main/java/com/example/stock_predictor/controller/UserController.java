@@ -14,4 +14,9 @@ public class UserController {
     public String login(){
         return "login";
     }
+
+    @GetMapping("/setting")
+    public String userSettings(){
+        return "user-settings";
+    }
 }
