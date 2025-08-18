@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Stock Predictor 종목 상세 페이지" />
+    <meta name="keywords" content="주식, 투자, Stock Predictor" />
+    <meta name="author" content="Jo YoungRan" />
+    <title>종목 상세 - Stock Predictor</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/common.css" />
+    <link rel="stylesheet" href="/css/stock-detail.css">
+
+    <script src="/js/stock-detail.js"></script>
+</head>
+<body>
+<header>
+    <div th:replace="~{fragments/nav :: nav}"></div>
+</header>
+
+<main class="container py-4">
+
+    <!-- 상단 종목 정보 -->
+    <section class="mb-4 d-flex justify-content-between align-items-center flex-wrap">
+        <div>
+            <h2 class="mb-1">삼성전자 (005930)</h2>
+        </div>
+        <div>
+            <button class="btn btn-outline-warning favorite-btn">⭐ 즐겨찾기</button>
+        </div>
+    </section>
+
+    <!-- 가격 차트 -->
+    <section class="mb-4">
+        <h4 class="mb-3">📈 가격 차트</h4>
+        <ul class="nav nav-tabs mb-2" id="chartTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="day-tab" data-bs-toggle="tab" data-bs-target="#day" type="button">1일</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="week-tab" data-bs-toggle="tab" data-bs-target="#week" type="button">1주</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="month-tab" data-bs-toggle="tab" data-bs-target="#month" type="button">1개월</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="year-tab" data-bs-toggle="tab" data-bs-target="#year" type="button">1년</button>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane fade show active chart-area" id="day">1일 차트 영역</div>
+            <div class="tab-pane fade chart-area" id="week">1주 차트 영역</div>
+            <div class="tab-pane fade chart-area" id="month">1개월 차트 영역</div>
+            <div class="tab-pane fade chart-area" id="year">1년 차트 영역</div>
+        </div>
+    </section>
+
+    <!-- 가치평가 지표 -->
+    <section class="mb-4">
+        <h4 class="mb-3">💹 가치평가 지표</h4>
+        <div class="indicator-card d-flex flex-wrap gap-3">
+            <span>PER: 12.3</span>
+            <span>PBR: 1.1</span>
+            <span>ROE: 15%</span>
+            <span>EV/EBITDA: 8.5</span>
+        </div>
+    </section>
+
+    <!-- 큰손 수급 -->
+    <section class="mb-4">
+        <h4 class="mb-3">🏦 큰손 수급</h4>
+        <div class="supply-chart">
+            외국인/기관 매수·매도 그래프 영역
+        </div>
+    </section>
+
+    <!-- 관련 뉴스 -->
+    <section class="mb-4">
+        <h4 class="mb-3">📰 관련 뉴스</h4>
+        <div class="news-item">
+            - 삼성전자, 실적 호조 [매일경제] [2025-08-18]
+        </div>
+        <div class="news-item">
+            - 신제품 발표 임박 [조선일보] [2025-08-17]
+        </div>
+        <div class="text-end mt-2">
+            <a href="/news" class="btn btn-outline-primary btn-sm">전체 보기</a>
+        </div>
+    </section>
+
+    <!-- 나의 메모 -->
+    <section class="mb-4">
+        <h4 class="mb-3">📝 나의 메모</h4>
+        <div class="memo-box">
+            <textarea placeholder="메모를 작성하세요..."></textarea>
+            <div class="text-end mt-2">
+                <button class="btn btn-primary btn-sm">저장</button>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
