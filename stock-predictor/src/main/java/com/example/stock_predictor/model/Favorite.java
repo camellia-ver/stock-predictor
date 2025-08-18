@@ -14,10 +14,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class Favorite {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long favId;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

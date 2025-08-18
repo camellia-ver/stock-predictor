@@ -16,7 +16,7 @@ import java.time.LocalDate;
 public class InstitutionalFlow {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long flowId;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stock_id", nullable = false)

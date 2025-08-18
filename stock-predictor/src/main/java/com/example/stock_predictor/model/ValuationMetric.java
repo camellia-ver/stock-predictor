@@ -17,7 +17,7 @@ import java.time.LocalDate;
 public class ValuationMetric {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long valuationId;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stock_id", nullable = false)

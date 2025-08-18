@@ -16,10 +16,10 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    private Long id;
 
     @Column(nullable = false, length = 50, unique = true)
-    private String username;
+    private String userName;
 
     @Column(nullable = false, length = 255)
     private String passwordHash;
@@ -34,5 +34,5 @@ public class User {
     private List<Favorite> favorites;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Note> notes;
+    private List<Memo> notes;
 }

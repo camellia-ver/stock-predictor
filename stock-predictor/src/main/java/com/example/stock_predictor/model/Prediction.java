@@ -14,10 +14,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class Prediction {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long predId;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stock_id", nullable = false)

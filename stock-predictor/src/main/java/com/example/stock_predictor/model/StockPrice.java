@@ -17,7 +17,7 @@ import java.time.LocalDate;
 public class StockPrice {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long priceId;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stock_id", nullable = false)
