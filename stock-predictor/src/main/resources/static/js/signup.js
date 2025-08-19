@@ -5,6 +5,31 @@ document.addEventListener("DOMContentLoaded", () => {
     const strengthText = document.getElementById('strengthText');
     const form = document.querySelector("form");
 
+    // === 규칙 체크 표시용 ===
+    const ruleLength = document.getElementById("rule-length");
+    const ruleUpper = document.getElementById("rule-upper");
+    const ruleLower = document.getElementById("rule-lower");
+    const ruleNumber = document.getElementById("rule-number");
+    const ruleSpecial = document.getElementById("rule-special");
+
+    // 규칙 체크 함수
+    function updateRules(password) {
+        ruleLength.textContent = (password.length >= 8 ? "✅ 최소 8자 이상" : "❌ 최소 8자 이상");
+        ruleLength.className = password.length >= 8 ? "text-success" : "text-danger";
+
+        ruleUpper.textContent = (/[A-Z]/.test(password) ? "✅ 대문자 1자 이상 포함" : "❌ 대문자 1자 이상 포함");
+        ruleUpper.className = /[A-Z]/.test(password) ? "text-success" : "text-danger";
+
+        ruleLower.textContent = (/[a-z]/.test(password) ? "✅ 소문자 1자 이상 포함" : "❌ 소문자 1자 이상 포함");
+        ruleLower.className = /[a-z]/.test(password) ? "text-success" : "text-danger";
+
+        ruleNumber.textContent = (/\d/.test(password) ? "✅ 숫자 1자 이상 포함" : "❌ 숫자 1자 이상 포함");
+        ruleNumber.className = /\d/.test(password) ? "text-success" : "text-danger";
+
+        ruleSpecial.textContent = (/[!@#$%^&*]/.test(password) ? "✅ 특수문자 1자 이상 포함" : "❌ 특수문자 1자 이상 포함");
+        ruleSpecial.className = /[!@#$%^&*]/.test(password) ? "text-success" : "text-danger";
+    }
+
     // 비밀번호 강도 체크 함수
     function checkStrength(password) {
         let score = 0;
@@ -16,8 +41,15 @@ document.addEventListener("DOMContentLoaded", () => {
         return score;
     }
 
+    // 입력 이벤트
     passwordInput.addEventListener('input', function() {
-        const score = checkStrength(passwordInput.value);
+        const password = passwordInput.value;
+        const score = checkStrength(password);
+
+        // 규칙 업데이트
+        updateRules(password);
+
+        // 강도 표시
         let strength = "";
         let barClass = "";
         let percent = (score / 5) * 100;
@@ -73,5 +105,23 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
             confirmPasswordInput.classList.remove("is-invalid");
         }
+    });
+
+    // === 비밀번호 표시/숨기기 토글 ===
+    const togglePassword = document.getElementById("togglePassword");
+    const toggleConfirmPassword = document.getElementById("toggleConfirmPassword");
+
+    togglePassword.addEventListener("click", function() {
+        const type = passwordInput.type === "password" ? "text" : "password";
+        passwordInput.type = type;
+        this.querySelector("i").classList.toggle("bi-eye");
+        this.querySelector("i").classList.toggle("bi-eye-slash");
+    });
+
+    toggleConfirmPassword.addEventListener("click", function() {
+        const type = confirmPasswordInput.type === "password" ? "text" : "password";
+        confirmPasswordInput.type = type;
+        this.querySelector("i").classList.toggle("bi-eye");
+        this.querySelector("i").classList.toggle("bi-eye-slash");
     });
 })
