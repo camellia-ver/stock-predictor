@@ -26,6 +26,7 @@
 
     <div class="row g-4">
         <!-- 회원 정보 수정 -->
+        <!-- 회원 정보 수정 -->
         <section class="col-lg-6">
             <h2 class="mb-3">👤 회원 정보 수정</h2>
             <div class="card shadow-sm p-3">
@@ -42,10 +43,35 @@
                         <label for="password" class="form-label">비밀번호</label>
                         <input type="password" class="form-control" id="password" placeholder="새 비밀번호">
                     </div>
-                    <button type="submit" class="btn btn-gradient">저장</button>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <button type="submit" class="btn btn-gradient">저장</button>
+                        <!-- 회원탈퇴 버튼 -->
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                            회원탈퇴
+                        </button>
+                    </div>
                 </form>
             </div>
         </section>
+
+        <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content text-dark">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteAccountModalLabel">회원탈퇴 확인</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                    </div>
+                    <div class="modal-body">
+                        정말 회원탈퇴하시겠습니까?<br>
+                        탈퇴 후 계정과 모든 데이터는 복구할 수 없습니다.
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                        <a href="/user/delete" class="btn btn-danger">탈퇴</a>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- 즐겨찾기 종목 관리 -->
         <section class="col-lg-6">
