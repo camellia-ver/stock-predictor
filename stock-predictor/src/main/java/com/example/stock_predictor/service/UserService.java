@@ -15,7 +15,11 @@ public class UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public User signup(SignupRequest request){
+    public void signup(SignupRequest request){
+        if (userRepository.existsByUserName(request.getUserName())){
+            throw new IllegalArgumentException("이미 등록된 사용자명입니다.");
+        }
+
         if (userRepository.existsByEmail(request.getEmail())){
             throw new IllegalArgumentException("이미 등록된 이메일입니다.");
         }
@@ -28,6 +32,6 @@ public class UserService {
                 .updatedAt(LocalDateTime.now())
                 .build();
 
-        return userRepository.save(user);
+        userRepository.save(user);
     }
 }

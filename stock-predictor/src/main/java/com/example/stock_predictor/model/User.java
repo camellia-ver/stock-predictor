@@ -35,4 +35,12 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Memo> notes;
+
+    @ManyToMany(fetch = FetchType.EAGER) // 인증 시 바로 권한을 가져오기 위해 EAGER
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private List<Role> roles;
 }
