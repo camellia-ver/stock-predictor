@@ -9,4 +9,9 @@ public class MemoController {
     public String memo(){
         return "memo";
     }
+
+    @GetMapping("/memo-detail")
+    public String memoDetail(){
+        return "memo-detail";
+    }
 }
