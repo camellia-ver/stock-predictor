@@ -35,9 +35,20 @@
 <!-- SIGNUP FORM -->
 <section class="signup-container">
     <div class="signup-card">
+
         <h2>회원가입</h2>
+        <!-- 오류 메시지 (카드 내부) -->
+        <div th:if="${errorMessage}" class="error-card mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-exclamation-circle me-2" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 1 8 0a8 8 0 0 1 0 16z"/>
+                <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zm.93-6.412-.9 4.5a.5.5 0 0 0 .986.164l.9-4.5a.5.5 0 0 0-.986-.164z"/>
+            </svg>
+            <span th:text="${errorMessage}"></span>
+        </div>
+
         <form method="POST" th:action="@{/signup}">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
             <div class="mb-3">
                 <label for="userName" class="form-label">사용자명</label>
                 <input type="text" class="form-control" id="userName" name="userName" required placeholder="사용자명을 입력하세요">

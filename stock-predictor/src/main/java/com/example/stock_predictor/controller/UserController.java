@@ -15,6 +15,7 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequiredArgsConstructor
@@ -28,7 +29,9 @@ public class UserController {
     }
 
     @PostMapping("/signup")
-    public String signup(SignupRequest request, HttpServletRequest httpRequest){
+    public String signup(SignupRequest request, HttpServletRequest httpRequest,
+                        RedirectAttributes redirectAttributes
+    ){
         try {
             User user = userService.signup(request);
 
@@ -46,7 +49,8 @@ public class UserController {
 
             return "redirect:/";
         } catch (IllegalArgumentException e){
-            return "redirect:/signup?error=" + e.getMessage();
+            redirectAttributes.addFlashAttribute("errorMessage",e.getMessage());
+            return "redirect:/signup";
         }
     }
 
