@@ -68,6 +68,80 @@
         </div>
     </section>
 
+    <!-- 예상 주가 (확률 기반) -->
+    <section class="mb-4">
+        <h4 class="mb-3">🔮 예상 주가 (확률 기반)</h4>
+        <div class="row g-3">
+
+            <!-- 내일 예측 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h6 class="card-title">2025-08-20 예측</h6>
+                        <p class="mb-2 small text-muted">모델: LSTM</p>
+
+                        <label class="fw-bold">상승 확률</label>
+                        <div class="progress mb-2">
+                            <div class="progress-bar bg-success" role="progressbar"
+                                 style="width: 65%;">65%</div>
+                        </div>
+
+                        <label class="fw-bold">하락 확률</label>
+                        <div class="progress">
+                            <div class="progress-bar bg-danger" role="progressbar"
+                                 style="width: 35%;">35%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 1주 후 예측 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h6 class="card-title">2025-08-27 예측</h6>
+                        <p class="mb-2 small text-muted">모델: Prophet</p>
+
+                        <label class="fw-bold">상승 확률</label>
+                        <div class="progress mb-2">
+                            <div class="progress-bar bg-success" role="progressbar"
+                                 style="width: 55%;">55%</div>
+                        </div>
+
+                        <label class="fw-bold">하락 확률</label>
+                        <div class="progress">
+                            <div class="progress-bar bg-danger" role="progressbar"
+                                 style="width: 45%;">45%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 1개월 후 예측 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h6 class="card-title">2025-09-19 예측</h6>
+                        <p class="mb-2 small text-muted">모델: XGBoost</p>
+
+                        <label class="fw-bold">상승 확률</label>
+                        <div class="progress mb-2">
+                            <div class="progress-bar bg-success" role="progressbar"
+                                 style="width: 40%;">40%</div>
+                        </div>
+
+                        <label class="fw-bold">하락 확률</label>
+                        <div class="progress">
+                            <div class="progress-bar bg-danger" role="progressbar"
+                                 style="width: 60%;">60%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
     <!-- 큰손 수급 -->
     <section class="mb-4">
         <h4 class="mb-3">🏦 큰손 수급</h4>
