@@ -10,9 +10,7 @@ public class HomeController {
     @GetMapping("/")
     public String home(Model model, Authentication authentication){
         if (authentication != null && authentication.isAuthenticated()){
-            model.addAttribute("homeLink","/dashboard");
-        }else {
-            model.addAttribute("homeLink","/");
+            return "redirect:/dashboard";
         }
         return "intro";
     }
