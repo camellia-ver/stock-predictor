@@ -6,6 +6,7 @@ import com.example.stock_predictor.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,8 +32,8 @@ public class UserController {
     }
 
     @PostMapping("/signup")
-    public String signup(SignupRequest request, HttpServletRequest httpRequest,
-                        RedirectAttributes redirectAttributes
+    public String signup(@Valid SignupRequest request, HttpServletRequest httpRequest,
+                         RedirectAttributes redirectAttributes
     ){
         try {
             User user = userService.signup(request);
