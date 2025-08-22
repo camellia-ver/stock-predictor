@@ -29,7 +29,7 @@ def get_korea_stock_ohlcv(start_date,end_date):
         df = stock.get_market_ohlcv_by_date(start_date,end_date,ticker)
         if df.empty:
             continue
-        
+
         df = df.reset_index()
         df['source'] = 'KRX'
         df['ticker'] = ticker
@@ -40,11 +40,14 @@ def get_korea_stock_ohlcv(start_date,end_date):
             '종가':'closePrice',
             '고가':'highPrice',
             '저가':'lowPrice',
-            '거래량':'volume'
+            '거래량':'volume',
+            '등락률':'changeRate'
         })
         df['date'] = pd.to_datetime(df['date']).dt.date
         all_data.append(df)
 
     return pd.concat(all_data, ignore_index=True)
 
-print(get_korea_stock_ohlcv(start_date,end_date))    
+df_all = get_korea_stock_ohlcv(start_date,end_date)
+
+df_all.to_csv(f'stock_price_data/korea_stock_price_{datetime.now().strftime('%Y_%m_%d')}.csv',index=False)

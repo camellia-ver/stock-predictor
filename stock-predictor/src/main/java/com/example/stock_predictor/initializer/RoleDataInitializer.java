@@ -25,7 +25,5 @@ public class RoleDataInitializer implements ApplicationRunner {
             Role adminRole = Role.builder().name("ADMIN").build();
             roleRepository.save(adminRole);
         }
-
-        System.out.println("초기 역할 데이터 삽입 완료!");
     }
 }

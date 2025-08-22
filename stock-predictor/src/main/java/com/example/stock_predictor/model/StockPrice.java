@@ -33,6 +33,9 @@ public class StockPrice {
 
     private Long volume;
 
+    @Column(precision = 5, scale = 2)
+    private BigDecimal changeRate;
+
     @Column(length = 20)
     private String source;
 }
