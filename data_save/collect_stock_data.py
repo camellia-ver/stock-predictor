@@ -1,23 +1,38 @@
-from pykrx import stock
-import yfinance as yf
 import pandas as pd
+from pykrx import stock
 from datetime import datetime
-from concurrent.futures import ThreadPoolExecutor
+import time
 
-def get_korea_stock():
-    data = []
+def get_korea_stock(max_retries=3, delay=5):
+    """
+    KOSPI/KOSDAQ 주식 정보를 수집하는 함수.
+    오류 발생 시 max_retries만큼 재시도하고, 실패하면 빈 DataFrame 반환.
+    
+    :param max_retries: 최대 재시도 횟수
+    :param delay: 재시도 전 대기 시간(초)
+    """
+    attempt = 0
+    while attempt < max_retries:
+        try:
+            data = []
 
-    kospi_tickers = stock.get_market_ticker_list(market="KOSPI")
-    kosdaq_tickers = stock.get_market_ticker_list(market="KOSDAQ")
-    all_tickers = kospi_tickers + kosdaq_tickers
+            kospi_tickers = stock.get_market_ticker_list(market="KOSPI")
+            kosdaq_tickers = stock.get_market_ticker_list(market="KOSDAQ")
+            all_tickers = kospi_tickers + kosdaq_tickers
 
-    for ticker in all_tickers:
-        name = stock.get_market_ticker_name(ticker)
-        market = "KOSPI" if ticker in stock.get_market_ticker_list("KOSPI") else "KOSDAQ"
-        data.append([ticker,name,market,None,datetime.now()])
+            for ticker in all_tickers:
+                name = stock.get_market_ticker_name(ticker)
+                market_type = "KOSPI" if ticker in kospi_tickers else "KOSDAQ"
+                data.append([ticker, name, market_type, None, datetime.now()])
 
-    return pd.DataFrame(data,columns=['ticker','name','market','sector','createAt'])
+            df = pd.DataFrame(data, columns=['ticker','name','market','sector','created_at'])
+            return df
 
-krx_df = get_korea_stock()
-krx_df.to_csv('stock_data/korea_stocks.csv',index=False,encoding='utf-8-sig')
-print(f'총 {len(krx_df)}개 종목 csv 저장완료!')
+        except Exception as e:
+            attempt += 1
+            print(f"[{attempt}/{max_retries}] 오류 발생: {e}. {delay}초 후 재시도...")
+            time.sleep(delay)
+
+    # 모든 재시도 실패 시 빈 DataFrame 반환
+    print("모든 재시도 실패. 빈 DataFrame 반환")
+    return pd.DataFrame(columns=['ticker','name','market','sector','created_at'])
