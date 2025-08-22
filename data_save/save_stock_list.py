@@ -4,7 +4,7 @@ from sqlalchemy import text
 from dotenv import load_dotenv
 import os
 
-from collect_stock_data import get_korea_stock
+from collect_stock_list import get_korea_stock
 
 load_dotenv()
 
