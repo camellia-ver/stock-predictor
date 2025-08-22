@@ -16,8 +16,9 @@ DB_NAME = os.getenv("DB_NAME")
 db_url = f'mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
 engine = create_engine(db_url, echo=False)
 
-start_date = '2025-01-01'
-end_date = '2025-08-21'
+start_date = input("시작 날짜를 입력하세요 (YYYY-MM-DD): ")
+end_date = input("종료 날짜를 입력하세요 (YYYY-MM-DD): ")
+file_prefix = input("파일명 접두사 선택 (new / all): ")
 
 def get_korea_stock_ohlcv(start_date,end_date):
     tickers_df = pd.read_sql("SELECT ticker FROM stocks", engine)
@@ -50,4 +51,7 @@ def get_korea_stock_ohlcv(start_date,end_date):
 
 df_all = get_korea_stock_ohlcv(start_date,end_date)
 
-df_all.to_csv(f'stock_price_data/korea_stock_price_{datetime.now().strftime('%Y_%m_%d')}.csv',index=False)
+file_name = f'stock_price_data/{file_prefix}_korea_stock_price_{datetime.now().strftime('%Y_%m_%d')}.csv'
+df_all.to_csv(file_name,index=False)
+
+print(f"CSV 파일이 저장되었습니다: {file_name}")
