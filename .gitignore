@@ -6,9 +6,10 @@ data_save/.env
 .idea/
 .vscode/
 
-# 로그 & 임시파일
+# 로그 & 임시파일 & csv 파일
 *.log
 *.tmp
+*.csv
 
 # OS 별 파일
 .DS_Store

@@ -19,5 +19,5 @@ def get_korea_stock():
     return pd.DataFrame(data,columns=['ticker','name','market','sector','createAt'])
 
 krx_df = get_korea_stock()
-krx_df.to_csv('korea_stocks.csv',index=False,encoding='utf-8-sig')
+krx_df.to_csv('stock_data/korea_stocks.csv',index=False,encoding='utf-8-sig')
 print(f'총 {len(krx_df)}개 종목 csv 저장완료!')
