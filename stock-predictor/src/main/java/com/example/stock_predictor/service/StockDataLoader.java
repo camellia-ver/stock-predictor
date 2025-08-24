@@ -9,13 +9,13 @@ import com.example.stock_predictor.repository.StockRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -24,6 +24,40 @@ public class StockDataLoader {
     private final StockRepository stockRepository;
     private final StockPriceRepository stockPriceRepository;
     private final StockIndexPriceRepository stockIndexPriceRepository;
+
+    public List<Stock> loadStockListCsv(String filePath) throws IOException {
+        List<Stock> readStockList = new ArrayList<>();
+        List<String> lines = Files.readAllLines(Paths.get(filePath));
+        lines.remove(0);
+
+        for (String line : lines) {
+            String[] cols = line.split(",");
+            if (cols.length < 5) continue;
+
+            String ticker = cols[0];
+            String name = cols[1];
+            String market = cols[2];
+            String sector = cols[3];
+            LocalDate date;
+            try {
+                date = LocalDate.parse(cols[4]);
+            } catch (DateTimeParseException e) {
+                continue;
+            }
+
+            Stock stock = Stock.builder()
+                    .ticker(ticker)
+                    .name(name)
+                    .market(market)
+                    .sector(sector)
+                    .date(date)
+                    .build();
+
+            readStockList.add(stock);
+        }
+
+        return readStockList;
+    }
 
     public void loadStockIndexPriceCsv(String filePath) throws IOException{
         List<String> lines = Files.readAllLines(Paths.get(filePath));

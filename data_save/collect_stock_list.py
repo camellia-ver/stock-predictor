@@ -24,7 +24,7 @@ def get_korea_stock(max_retries=3, delay=5):
             for ticker in all_tickers:
                 name = stock.get_market_ticker_name(ticker)
                 market_type = "KOSPI" if ticker in kospi_tickers else "KOSDAQ"
-                data.append([ticker, name, market_type, None, datetime.now()])
+                data.append([ticker, name, market_type, None, datetime.now().strftime('%Y-%m-%d')])
 
             df = pd.DataFrame(data, columns=['ticker','name','market','sector','date'])
             return df
