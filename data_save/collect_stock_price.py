@@ -4,6 +4,8 @@ from datetime import datetime
 from sqlalchemy import create_engine
 from dotenv import load_dotenv
 import os
+import math
+import time
 
 load_dotenv()
 
@@ -20,37 +22,51 @@ start_date = input("시작 날짜를 입력하세요 (YYYY-MM-DD): ")
 end_date = input("종료 날짜를 입력하세요 (YYYY-MM-DD): ")
 file_prefix = input("파일명 접두사 선택 (new / all): ")
 
-def get_korea_stock_ohlcv(start_date,end_date):
+def get_korea_stock_ohlcv(start_date, end_date, batch_size=50, sleep_sec=1):
     tickers_df = pd.read_sql("SELECT ticker FROM stocks", engine)
     tickers = tickers_df['ticker'].tolist()
     
     all_data = []
+    total_batches = math.ceil(len(tickers) / batch_size)
 
-    for ticker in tickers:
-        df = stock.get_market_ohlcv_by_date(start_date,end_date,ticker)
-        if df.empty:
-            continue
+    for i in range(total_batches):   
+        batch = tickers[i * batch_size : (i+1) * batch_size]
+        batch_data = []
 
-        df = df.reset_index()
-        df['ticker'] = ticker
+        for ticker in batch:
+            df = stock.get_market_ohlcv_by_date(start_date, end_date, ticker)
+            if df.empty:
+                continue
 
-        df = df.rename(columns={
-            '날짜':'date',
-            '시가':'openPrice',
-            '종가':'closePrice',
-            '고가':'highPrice',
-            '저가':'lowPrice',
-            '거래량':'volume',
-            '등락률':'changeRate'
-        })
-        df['date'] = pd.to_datetime(df['date']).dt.date
-        all_data.append(df)
+            df = df.reset_index()
+            df['ticker'] = ticker
+
+            df = df.rename(columns={
+                '날짜':'date',
+                '시가':'openPrice',
+                '종가':'closePrice',
+                '고가':'highPrice',
+                '저가':'lowPrice',
+                '거래량':'volume',
+                '등락률':'changeRate'
+            })
+            df['date'] = pd.to_datetime(df['date']).dt.date
+            batch_data.append(df)
+
+        if batch_data:
+            all_data.extend(batch_data)
+
+        print(f"✅ Batch {i+1}/{total_batches} 완료")
+        time.sleep(sleep_sec)
 
     return pd.concat(all_data, ignore_index=True)
 
-df_all = get_korea_stock_ohlcv(start_date,end_date)
+df_all = get_korea_stock_ohlcv(start_date, end_date)
 
-file_name = f'stock_price_data/{file_prefix}_korea_stock_price_{datetime.now().strftime('%Y_%m_%d')}.csv'
-df_all.to_csv(file_name,index=False)
+os.makedirs("stock_price_data", exist_ok=True)
+
+file_name = f"stock_price_data/{file_prefix}_korea_stock_price_{datetime.now().strftime('%Y_%m_%d')}.csv"
+df_all.to_csv(file_name, index=False, encoding="utf-8-sig")  # 한글깨짐 방지
 
 print(f"CSV 파일이 저장되었습니다: {file_name}")
+
