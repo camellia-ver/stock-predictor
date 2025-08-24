@@ -2,6 +2,7 @@ import pandas as pd
 from pykrx import stock
 from datetime import datetime
 import time
+import os
 
 def get_korea_stock(max_retries=3, delay=5):
     """
@@ -25,7 +26,7 @@ def get_korea_stock(max_retries=3, delay=5):
                 market_type = "KOSPI" if ticker in kospi_tickers else "KOSDAQ"
                 data.append([ticker, name, market_type, None, datetime.now()])
 
-            df = pd.DataFrame(data, columns=['ticker','name','market','sector','created_at'])
+            df = pd.DataFrame(data, columns=['ticker','name','market','sector','date'])
             return df
 
         except Exception as e:
@@ -35,4 +36,11 @@ def get_korea_stock(max_retries=3, delay=5):
 
     # 모든 재시도 실패 시 빈 DataFrame 반환
     print("모든 재시도 실패. 빈 DataFrame 반환")
-    return pd.DataFrame(columns=['ticker','name','market','sector','created_at'])
+    return pd.DataFrame(columns=['ticker','name','market','sector','date'])
+
+os.makedirs("stock_price_data", exist_ok=True)
+
+file_name = f"stock_price_data/stock_list.csv"
+get_korea_stock().to_csv(file_name, index=False, encoding="utf-8-sig")  # 한글깨짐 방지
+
+print(f"CSV 파일이 저장되었습니다: {file_name}")

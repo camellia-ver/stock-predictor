@@ -33,7 +33,8 @@ def get_korea_index_ohlcv(start_date, end_date):
             "저가": "lowPrice",
             "종가": "closePrice",
             "거래량": "volume",
-            "거래대금": "value"
+            "거래대금": "value",
+            "상장시가총액":"marketCap"
         })
         df['date'] = pd.to_datetime(df['날짜']).dt.date
         df.drop(columns=["날짜"], inplace=True)  # 원래 한글 컬럼 제거

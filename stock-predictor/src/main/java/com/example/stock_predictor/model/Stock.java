@@ -3,6 +3,7 @@ package com.example.stock_predictor.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -28,5 +29,5 @@ public class Stock {
     @Column(length = 100)
     private String sector;
 
-    private LocalDateTime createdAt;
+    private LocalDate date;
 }

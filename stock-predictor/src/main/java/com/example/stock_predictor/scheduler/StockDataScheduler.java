@@ -1,6 +1,7 @@
 package com.example.stock_predictor.scheduler;
 
 import com.example.stock_predictor.service.StockDataLoader;
+import com.example.stock_predictor.utills.Formatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -22,12 +23,14 @@ public class StockDataScheduler {
     private final StockDataLoader stockDataLoader;
 
     @Scheduled(cron = "0 55 8 ? * TUE-SAT")
-    public void updateDailyStockPrice() throws IOException {
-        LocalDate today = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd");
-        String formattedDate = today.format(formatter);
+    public void updateDailyStockData() throws IOException {
+        Formatter formatter = new Formatter();
+        String formattedDate = formatter.formattingDate();
 
         Path path = Paths.get(stockPriceFilesPath, "new_korea_stock_price_" + formattedDate + ".csv");
         stockDataLoader.loadStockPriceCsv(path.toString());
+
+        path = Paths.get(stockPriceFilesPath, "new_korea_stock_index_price_" + formattedDate + ".csv");
+        stockDataLoader.loadStockIndexPriceCsv(path.toString());
     }
 }

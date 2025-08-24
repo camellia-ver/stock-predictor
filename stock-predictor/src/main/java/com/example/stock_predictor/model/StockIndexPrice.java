@@ -28,7 +28,8 @@ public class StockIndexPrice {
     private BigDecimal lowPrice;
 
     private Long volume;
-
     // 거래대금
-    private BigDecimal value;
+    private Long value;
+    // 시가상장총액
+    private Long marketCap;
 }
