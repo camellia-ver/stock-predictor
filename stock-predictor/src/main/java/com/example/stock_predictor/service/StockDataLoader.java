@@ -17,7 +17,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class StockPriceLoader {
+public class StockDataLoader {
     private final StockRepository stockRepository;
     private final StockPriceRepository stockPriceRepository;
 

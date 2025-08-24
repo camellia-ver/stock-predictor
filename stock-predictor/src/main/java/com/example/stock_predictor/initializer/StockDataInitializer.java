@@ -1,7 +1,7 @@
 package com.example.stock_predictor.initializer;
 
 import com.example.stock_predictor.repository.StockPriceRepository;
-import com.example.stock_predictor.service.StockPriceLoader;
+import com.example.stock_predictor.service.StockDataLoader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
@@ -17,10 +17,10 @@ import java.time.format.DateTimeFormatter;
 @Component
 @RequiredArgsConstructor
 @PropertySource("classpath:paths.properties")
-public class StockPriceDataInitializer implements ApplicationRunner {
+public class StockDataInitializer implements ApplicationRunner {
     @Value("${stockPrice.files.path}")
     private String stockPriceFilesPath;
-    private final StockPriceLoader stockPriceLoader;
+    private final StockDataLoader stockDataLoader;
     private final StockPriceRepository stockPriceRepository;
 
     @Override
@@ -31,7 +31,7 @@ public class StockPriceDataInitializer implements ApplicationRunner {
             String formattedDate = today.format(formatter);
 
             Path path = Paths.get(stockPriceFilesPath, "all_korea_stock_price_" + formattedDate + ".csv");
-            stockPriceLoader.loadCsv(path.toString());
+            stockDataLoader.loadCsv(path.toString());
         }
     }
 }
