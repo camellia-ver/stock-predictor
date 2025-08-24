@@ -33,7 +33,7 @@ public class StockPrice {
 
     private Long volume;
 
-    @Column(precision = 5, scale = 2)
+    @Column(precision = 7, scale = 2)
     private BigDecimal changeRate;
 }
 

@@ -1,6 +1,8 @@
 package com.example.stock_predictor.scheduler;
 
+import com.example.stock_predictor.model.Stock;
 import com.example.stock_predictor.service.StockDataLoader;
+import com.example.stock_predictor.service.StockService;
 import com.example.stock_predictor.utills.Formatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -21,6 +24,7 @@ public class StockDataScheduler {
     @Value("${stockPrice.files.path}")
     private String stockPriceFilesPath;
     private final StockDataLoader stockDataLoader;
+    private final StockService stockService;
 
     @Scheduled(cron = "0 55 8 ? * TUE-SAT")
     public void updateDailyStockData() throws IOException {
@@ -32,5 +36,9 @@ public class StockDataScheduler {
 
         path = Paths.get(stockPriceFilesPath, "new_korea_stock_index_price_" + formattedDate + ".csv");
         stockDataLoader.loadStockIndexPriceCsv(path.toString());
+
+        path = Paths.get(stockPriceFilesPath, "stock_list.csv");
+        List<Stock> stockList = stockDataLoader.loadStockListCsv(path.toString());
+        stockService.syncWithCsv(stockList);
     }
 }
