@@ -28,6 +28,6 @@ public class StockDataScheduler {
         String formattedDate = today.format(formatter);
 
         Path path = Paths.get(stockPriceFilesPath, "new_korea_stock_price_" + formattedDate + ".csv");
-        stockDataLoader.loadCsv(path.toString());
+        stockDataLoader.loadStockPriceCsv(path.toString());
     }
 }

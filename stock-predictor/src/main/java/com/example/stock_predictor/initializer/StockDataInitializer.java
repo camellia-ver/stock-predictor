@@ -31,7 +31,7 @@ public class StockDataInitializer implements ApplicationRunner {
             String formattedDate = today.format(formatter);
 
             Path path = Paths.get(stockPriceFilesPath, "all_korea_stock_price_" + formattedDate + ".csv");
-            stockDataLoader.loadCsv(path.toString());
+            stockDataLoader.loadStockPriceCsv(path.toString());
         }
     }
 }

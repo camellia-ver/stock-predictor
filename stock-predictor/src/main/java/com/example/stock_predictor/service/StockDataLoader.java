@@ -21,7 +21,7 @@ public class StockDataLoader {
     private final StockRepository stockRepository;
     private final StockPriceRepository stockPriceRepository;
 
-    public void loadCsv(String filePath) throws IOException {
+    public void loadStockPriceCsv(String filePath) throws IOException {
         List<String> lines = Files.readAllLines(Paths.get(filePath));
         lines.remove(0); // 헤더 제거
 
