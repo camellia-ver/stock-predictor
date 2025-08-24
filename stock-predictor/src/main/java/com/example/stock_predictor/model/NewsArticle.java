@@ -33,8 +33,5 @@ public class NewsArticle {
     private String publisher;
 
     private LocalDateTime publishedAt;
-
-    @Column(length = 20)
-    private String source;
 }
 

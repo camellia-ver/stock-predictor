@@ -17,6 +17,8 @@ public class StockIndexPrice {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String indexName;
+
     @Column(nullable = false)
     private LocalDate date;
 
@@ -29,7 +31,4 @@ public class StockIndexPrice {
 
     // 거래대금
     private BigDecimal value;
-
-    @Column(length = 20)
-    private String source;
 }

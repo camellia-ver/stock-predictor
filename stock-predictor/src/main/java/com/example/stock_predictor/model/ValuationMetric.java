@@ -31,7 +31,4 @@ public class ValuationMetric {
     private BigDecimal eps;
     private BigDecimal bps;
     private BigDecimal dividendYield;
-
-    @Column(length = 20)
-    private String source;
 }

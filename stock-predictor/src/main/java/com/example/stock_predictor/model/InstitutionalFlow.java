@@ -30,7 +30,4 @@ public class InstitutionalFlow {
     private Long institutionSell;
     private Long individualBuy;
     private Long individualSell;
-
-    @Column(length = 20)
-    private String source;
 }

@@ -42,7 +42,6 @@ public class StockPriceLoader {
             BigDecimal lowPrice = cols[4].isEmpty() ? BigDecimal.ZERO : new BigDecimal(cols[4]);
             Long volume = cols[5].isEmpty() ? 0L : Long.parseLong(cols[5]);
             BigDecimal changeRate = cols[6].isEmpty() ? BigDecimal.ZERO : new BigDecimal(cols[6]);
-            String source = cols[7];
 
             Stock stock = stockRepository.findByTicker(ticker)
                     .orElseThrow(() -> new RuntimeException("Stock not found: " + ticker));
@@ -56,7 +55,6 @@ public class StockPriceLoader {
                     .lowPrice(lowPrice)
                     .volume(volume)
                     .changeRate(changeRate)
-                    .source(source)
                     .build();
 
             stockPriceRepository.save(stockPrice);
