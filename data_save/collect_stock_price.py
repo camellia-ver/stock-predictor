@@ -32,7 +32,6 @@ def get_korea_stock_ohlcv(start_date,end_date):
             continue
 
         df = df.reset_index()
-        df['source'] = 'KRX'
         df['ticker'] = ticker
 
         df = df.rename(columns={
