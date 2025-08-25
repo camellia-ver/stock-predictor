@@ -6,26 +6,39 @@ import com.example.stock_predictor.model.StockPrice;
 import com.example.stock_predictor.repository.StockIndexPriceRepository;
 import com.example.stock_predictor.repository.StockPriceRepository;
 import com.example.stock_predictor.repository.StockRepository;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
 public class StockDataLoader {
+    private static final int BATCH_SIZE = 1000;
+
     private final StockRepository stockRepository;
     private final StockPriceRepository stockPriceRepository;
     private final StockIndexPriceRepository stockIndexPriceRepository;
+    private final EntityManager em;
 
     public List<Stock> loadStockListCsv(String filePath) throws IOException {
+        if (!checkFileExistsOrSkip(filePath)) {
+            return null; // 파일 없으면 바로 종료
+        }
+
         List<Stock> readStockList = new ArrayList<>();
         List<String> lines = Files.readAllLines(Paths.get(filePath));
         lines.remove(0);
@@ -60,6 +73,10 @@ public class StockDataLoader {
     }
 
     public void loadStockIndexPriceCsv(String filePath) throws IOException{
+        if (!checkFileExistsOrSkip(filePath)) {
+            return; // 파일 없으면 바로 종료
+        }
+
         List<String> lines = Files.readAllLines(Paths.get(filePath));
         lines.remove(0);
 
@@ -75,13 +92,13 @@ public class StockDataLoader {
                 continue;
             }
 
-            BigDecimal openPrice = cols[0].isEmpty() ? BigDecimal.ZERO : new BigDecimal(cols[0]);
-            BigDecimal highPrice = cols[1].isEmpty() ? BigDecimal.ZERO : new BigDecimal(cols[1]);
-            BigDecimal lowPrice = cols[2].isEmpty() ? BigDecimal.ZERO : new BigDecimal(cols[2]);
-            BigDecimal closePrice = cols[3].isEmpty() ? BigDecimal.ZERO : new BigDecimal(cols[3]);
-            Long volume = cols[4].isEmpty() ? 0L : Long.parseLong(cols[4]);
-            Long value = cols[5].isEmpty() ? 0L : Long.parseLong(cols[5]);
-            Long marketCap = cols[6].isEmpty() ? 0L : Long.parseLong(cols[5]);
+            BigDecimal openPrice = parseBigDecimal(cols[0]);
+            BigDecimal highPrice = parseBigDecimal(cols[1]);
+            BigDecimal lowPrice = parseBigDecimal(cols[2]);
+            BigDecimal closePrice = parseBigDecimal(cols[3]);
+            Long volume = parseLong(cols[4]);
+            Long value = parseLong(cols[5]);
+            Long marketCap = parseLong(cols[5]);
 
             StockIndexPrice stockIndexPrice = StockIndexPrice.builder()
                     .indexName(indexName)
@@ -99,43 +116,93 @@ public class StockDataLoader {
         }
     }
 
+    @Transactional
     public void loadStockPriceCsv(String filePath) throws IOException {
-        List<String> lines = Files.readAllLines(Paths.get(filePath));
-        lines.remove(0); // 헤더 제거
+        if (!checkFileExistsOrSkip(filePath)) {
+            return; // 파일 없으면 바로 종료
+        }
 
-        for (String line : lines){
-            String[] cols = line.split(",");
-            if (cols.length < 8) continue;
+        // 1) 필요한 티커만 캐시
+        Map<String, Stock> stockCache = loadStockCache(filePath);
 
-            String ticker = cols[7];
-            LocalDate date;
-            try {
-                date = LocalDate.parse(cols[0]);
-            } catch (DateTimeParseException e){
-                continue;
+        List<StockPrice> buffer = new ArrayList<>(BATCH_SIZE);
+        try (Stream<String> lines = Files.lines(Paths.get(filePath))) {
+            final Iterator<String> it = lines.skip(1).iterator(); // 헤더 스킵
+            while (it.hasNext()) {
+                String line = it.next();
+                String[] cols = line.split(",", -1);
+                if (cols.length < 8) continue;
+
+                // 파싱
+                LocalDate date;
+                try {
+                    date = LocalDate.parse(cols[0]); // yyyy-MM-dd 가정
+                } catch (DateTimeParseException e) { continue; }
+
+                String ticker = cols[7];
+                Stock stock = stockCache.get(ticker);
+                if (stock == null) continue;
+
+                BigDecimal open  = parseBigDecimal(cols[1]);
+                BigDecimal close = parseBigDecimal(cols[2]);
+                BigDecimal high  = parseBigDecimal(cols[3]);
+                BigDecimal low   = parseBigDecimal(cols[4]);
+                Long volume      = parseLong(cols[5]);
+                BigDecimal chgRt = parseBigDecimal(cols[6]);
+
+                buffer.add(StockPrice.builder()
+                        .stock(stock)
+                        .date(date)
+                        .openPrice(open)
+                        .closePrice(close)
+                        .highPrice(high)
+                        .lowPrice(low)
+                        .volume(volume)
+                        .changeRate(chgRt)
+                        .build());
+
+                if (buffer.size() >= BATCH_SIZE) {
+                    stockPriceRepository.saveAll(buffer);
+                    em.flush();   // DB로 밀어넣기
+                    em.clear();   // 1차 캐시 비움 (메모리 사용량 안정화)
+                    buffer.clear();
+                }
             }
-            BigDecimal openPrice = cols[1].isEmpty() ? BigDecimal.ZERO : new BigDecimal(cols[1]);
-            BigDecimal closePrice = cols[2].isEmpty() ? BigDecimal.ZERO : new BigDecimal(cols[2]);
-            BigDecimal highPrice = cols[3].isEmpty() ? BigDecimal.ZERO : new BigDecimal(cols[3]);
-            BigDecimal lowPrice = cols[4].isEmpty() ? BigDecimal.ZERO : new BigDecimal(cols[4]);
-            Long volume = cols[5].isEmpty() ? 0L : Long.parseLong(cols[5]);
-            BigDecimal changeRate = cols[6].isEmpty() ? BigDecimal.ZERO : new BigDecimal(cols[6]);
-
-            Stock stock = stockRepository.findByTicker(ticker)
-                    .orElseThrow(() -> new RuntimeException("Stock not found: " + ticker));
-
-            StockPrice stockPrice = StockPrice.builder()
-                    .stock(stock)
-                    .date(date)
-                    .openPrice(openPrice)
-                    .closePrice(closePrice)
-                    .highPrice(highPrice)
-                    .lowPrice(lowPrice)
-                    .volume(volume)
-                    .changeRate(changeRate)
-                    .build();
-
-            stockPriceRepository.save(stockPrice);
+        }
+        if (!buffer.isEmpty()) {
+            stockPriceRepository.saveAll(buffer);
+            em.flush();
+            em.clear();
         }
     }
+
+    private Map<String, Stock> loadStockCache(String filePath) throws IOException {
+        Set<String> tickers = new HashSet<>();
+        try (Stream<String> lines = Files.lines(Paths.get(filePath))) {
+            lines.skip(1).forEach(line -> {
+                String[] cols = line.split(",", -1);
+                if (cols.length >= 8) tickers.add(cols[7]);
+            });
+        }
+        return stockRepository.findByTickerIn(tickers).stream()
+                .collect(Collectors.toMap(Stock::getTicker, Function.identity()));
+    }
+
+    private boolean checkFileExistsOrSkip(String filePath){
+        Path path = Paths.get(filePath);
+        if (!Files.exists(path)){
+            System.out.println("CSV 파일이 존재하지 않아 스킵합니다: "+ filePath);
+            return false;
+        }
+        return true;
+    }
+
+    private BigDecimal parseBigDecimal(String value) {
+        return (value == null || value.isEmpty()) ? BigDecimal.ZERO : new BigDecimal(value);
+    }
+
+    private Long parseLong(String value) {
+        return (value == null || value.isEmpty()) ? 0L : Long.parseLong(value);
+    }
+
 }
