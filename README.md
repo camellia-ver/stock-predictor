@@ -13,7 +13,7 @@ Python 라이브러리를 통해 과거 주식 데이터를 자동 수집·가�
 
 ## 🎯 주요 기능
 - 📈 **과거 데이터 기반 분석**
-- 🤖 **자동 데이터 수집**: `yfinance`, `pykrx`를 활용한 주식 데이터 수집
+- 🤖 **자동 데이터 수집**: `pykrx`를 활용한 주식 데이터 수집
 - 📊 **시각적 정보 제공**: `Chart.js`를 활용한 차트와 그래프
 - 🔮 **간단한 예측 모델**: `scikit-learn` 기반 머신러닝으로 주가 변동 가능성 제시
 - ⭐ **즐겨찾기 기능**: 관심 종목을 저장해 한 번의 클릭으로 빠르게 조회
@@ -26,6 +26,6 @@ Python 라이브러리를 통해 과거 주식 데이터를 자동 수집·가�
 | **Frontend** | HTML, CSS, JavaScript, Bootstrap |
 | **Backend** | Java 21, Spring Boot 3.5.4 |
 | **Database** | MySQL 8.0.25 |
-| **Data Processing & AI Model** | Python (`Pandas`, `scikit-learn`, `yfinance`, `pykrx`) |
+| **Data Processing & AI Model** | Python (`Pandas`, `scikit-learn`, `pykrx`) |
 | **ORM** | Spring Data JPA (Hibernate) |
 | **Visualization**  | Chart.js |
