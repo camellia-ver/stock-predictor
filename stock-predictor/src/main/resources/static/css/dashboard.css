@@ -13,3 +13,21 @@
 #indexSelector {
     margin-bottom: 1rem; /* 선택박스 하단 여백 */
 }
+
+/* ----------------- 탭 글자 대비 향상 ----------------- */
+.nav-tabs .nav-link {
+    color: rgba(255,255,255,0.85);
+    transition: all 0.2s ease;
+}
+
+.nav-tabs .nav-link:hover {
+    color: #ffffff;
+    background-color: rgba(0,0,0,0.25);
+    border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.nav-tabs .nav-link.active {
+    color: #ffffff;
+    font-weight: 700;
+    background-color: rgba(0,0,0,0.35);
+}
