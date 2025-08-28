@@ -17,7 +17,6 @@ public class StockIndexPriceApiController {
     // 모든 지수 이름 가져오기
     @GetMapping("/names")
     public List<String> getIndexNames(){
-        System.out.println(stockIndexPriceRepository.findDistinctIndexNames());
         return stockIndexPriceRepository.findDistinctIndexNames();
     }
 

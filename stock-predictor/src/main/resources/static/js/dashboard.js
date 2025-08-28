@@ -43,12 +43,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // 이벤트 바인딩
-    indexSelector.addEventListener("change", () => loadChart());
-    tabs.forEach(tab => {
-        tab.addEventListener("click", () => {
-            const period = tab.id.replace("-tab", ""); // week, month, year
-            loadChart(period);
-        });
+    indexSelector.addEventListener("change", () => {
+        // 모든 탭에서 active 제거
+        tabs.forEach(t => t.classList.remove("active"));
+
+        // week 탭 활성화
+        const weekTab = document.getElementById("week-tab");
+        weekTab.classList.add("active");
+
+        // 차트 로드 (week로)
+        loadChart("week");
     });
 
     // 초기 실행 (여기서는 그냥 직접 실행)
