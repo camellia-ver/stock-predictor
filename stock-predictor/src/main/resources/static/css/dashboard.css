@@ -31,3 +31,8 @@
     font-weight: 700;
     background-color: rgba(0,0,0,0.35);
 }
+
+#chartCanvas {
+  width: 100% !important;
+  height: 300px !important; /* 원하는 고정 높이 */
+}

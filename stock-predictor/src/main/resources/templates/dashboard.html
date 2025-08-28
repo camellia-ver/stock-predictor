@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="/css/dashboard.css">
 
     <script src="/js/dashboard.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -64,7 +65,7 @@
         </select>
         <ul class="nav nav-tabs mb-2" id="chartTab" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="week-tab" data-bs-toggle="tab" data-bs-target="#week" type="button">1주</button>
+                <button class="nav-link active" id="week-tab" data-bs-toggle="tab" data-bs-target="#week" type="button">1주</button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="month-tab" data-bs-toggle="tab" data-bs-target="#month" type="button">1개월</button>
@@ -75,10 +76,7 @@
         </ul>
         <div class="card shadow-sm">
             <div class="card-body">
-                <div style="height:300px; background:rgba(255,255,255,0.1); border-radius:12px;"
-                     class="d-flex align-items-center justify-content-center text-muted">
-                    차트 영역 (예: KOSPI/KOSDAQ)
-                </div>
+                <canvas id="chartCanvas" style="background:rgba(255,255,255,0.1); border-radius:12px;"></canvas>
             </div>
         </div>
     </section>
