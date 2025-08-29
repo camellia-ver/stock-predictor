@@ -27,3 +27,26 @@
     font-size: 2.5rem;
     margin-bottom: 10px;
 }
+
+/* FEATURES SECTION 반응형 중앙 정렬 최적화 */
+#features .row {
+    justify-content: center; /* 행 전체 중앙 정렬 */
+}
+
+#features .col {
+    display: flex;
+    justify-content: center; /* 컬럼 내 카드 중앙 정렬 */
+    margin-bottom: 1.5rem; /* 모바일에서 카드 간 여백 확보 */
+}
+
+#features .card {
+    max-width: 300px; /* 카드 최대 폭 제한 */
+    width: 100%; /* 작은 화면에서도 꽉 차게 */
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    transition: transform 0.2s ease-in-out;
+}
+
+#features .card:hover {
+    transform: translateY(-5px);
+}
