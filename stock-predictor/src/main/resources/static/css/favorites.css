@@ -3,13 +3,12 @@
     color: #4da8ff !important; /* 밝은 하늘색 */
 }
 
-/* 메모 버튼 시인성 강화 */
-.btn-outline-primary {
+.memo-btn-cell .btn-outline-primary {
     color: #ffffff !important;
     border-color: #4da8ff !important;
 }
 
-.btn-outline-primary:hover {
+.memo-btn-cell .btn-outline-primary:hover {
     background: linear-gradient(135deg, #0d6efd, #6610f2);
     color: #fff !important;
     border-color: transparent !important;

@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="/css/favorites.css">
 
     <script src="/js/nav.js"></script>
+    <script src="/js/favorites.js"></script>
 </head>
 <body>
 
@@ -26,7 +27,7 @@
 <main class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>⭐ 즐겨찾기 종목</h2>
-        <a href="/dashboard" class="btn btn-outline-light btn-sm">← 대시보드로</a>
+        <a href="/" class="btn btn-outline-light btn-sm">← 대시보드로</a>
     </div>
 
     <!-- 검색 및 정렬 -->
@@ -56,24 +57,28 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td class="fw-bold text-primary">삼성전자</td>
-                    <td class="text-end">75,000</td>
-                    <td class="text-end text-success">▲ 1.2%</td>
-                    <td class="text-center"><a href="/memo/1" class="btn btn-sm btn-outline-primary">보기</a></td>
-                </tr>
-                <tr>
-                    <td class="fw-bold text-primary">카카오</td>
-                    <td class="text-end">55,000</td>
-                    <td class="text-end text-danger">▼ 0.5%</td>
-                    <td class="text-center"><a href="/memo/2" class="btn btn-sm btn-outline-primary">보기</a></td>
-                </tr>
-                <tr>
-                    <td class="fw-bold text-primary">현대차</td>
-                    <td class="text-end">210,000</td>
-                    <td class="text-end text-success">▲ 2.1%</td>
-                    <td class="text-center"><a href="/memo/3" class="btn btn-sm btn-outline-primary">보기</a></td>
-                </tr>
+                    <tr th:each="stock : ${favorites}">
+                        <td class="fw-bold text-primary" th:text="${stock.name}"></td>
+                        <td class="text-end" th:text="${#numbers.formatDecimal(stock.price,0,'COMMA',0,'POINT')}"></td>
+                        <td class="text-end">
+                            <span th:if="${stock.changePercent != null and stock.changePercent > 0}"
+                                class="text-success"
+                                th:text="'▲ ' + ${#numbers.formatDecimal(stock.changePercent,1,1)} + '%'">
+                            </span>
+
+                            <span th:if="${stock.changePercent != null and stock.changePercent < 0}"
+                                class="text-danger"
+                                th:text="'▼ ' + ${#numbers.formatDecimal(stock.changePercent,1,1)} + '%'">
+                            </span>
+
+                            <span th:if="${stock.changePercent == null}"
+                                th:text="'-'">
+                            </span>
+                        </td>
+                        <td class="text-center memo-btn-cell">
+                            <a th:href="@{/memo/{id}(id=${stock.ticker})}" class="btn btn-sm btn-outline-primary">보기</a>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
