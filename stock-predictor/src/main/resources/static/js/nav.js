@@ -53,7 +53,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         inputEl.addEventListener("keydown", (e) => {
             const items = listEl.getElementsByTagName("li");
-            if (!items) return;
 
             if (e.key === "ArrowDown") {
                 currentFocus++;
@@ -64,7 +63,11 @@ document.addEventListener("DOMContentLoaded", () => {
             } else if (e.key === "Enter") {
                 e.preventDefault();
                 if (currentFocus > -1 && items[currentFocus]) {
+                    // 선택된 자동완성 항목이 있으면 클릭
                     items[currentFocus].click();
+                } else if (inputEl.value.trim() !== "") {
+                    // 선택된 항목이 없으면 입력값 기반으로 검색 페이지 이동
+                    window.location.href = `/search?query=${encodeURIComponent(inputEl.value.trim())}`;
                 }
             }
         });
