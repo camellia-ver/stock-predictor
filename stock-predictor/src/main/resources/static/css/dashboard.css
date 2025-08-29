@@ -77,3 +77,10 @@
 #helpBtn:hover {
   background-color: #1D4ED8;
 }
+
+#detailPanel {
+  white-space: pre-wrap;
+  color: black;
+  background-color: white;
+  padding: 5px;
+}

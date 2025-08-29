@@ -128,8 +128,8 @@ document.addEventListener("DOMContentLoaded", () => {
           },
           legend: { display: true },
           tooltip: {
-            mode: "index",
-            intersect: false,
+            mode: "nearest",
+            intersect: true,
             callbacks: {
               label: (ctx) => {
                 const v = ctx.raw; // candlestick/bar 데이터 그대로 접근
@@ -164,6 +164,24 @@ document.addEventListener("DOMContentLoaded", () => {
             grid: { display: false },
             ticks: { callback: v => v.toLocaleString() },
             beginAtZero: true
+          }
+        },
+        onClick: (evt) => {
+          // 클릭된 요소 가져오기
+          const elements = chart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, false);
+          if (!elements || elements.length === 0) return;
+
+          const e = elements[0];
+          const dataset = chart.data.datasets[e.datasetIndex];
+          const d = dataset.data[e.index];
+
+          // 캔들스틱 데이터인지 확인 (o,h,l,c 값이 있는지)
+          if (d && d.o !== undefined && d.h !== undefined && d.l !== undefined && d.c !== undefined) {
+            const date = new Date(d.x);
+            document.getElementById("detailPanel").innerHTML = `
+              <strong>${indexSelector.value} (${date.toLocaleDateString()})</strong><br>
+              O: ${d.o} / H: ${d.h} / L: ${d.l} / C: ${d.c} / V: ${d.v ?? "-"}
+            `;
           }
         }
       }
