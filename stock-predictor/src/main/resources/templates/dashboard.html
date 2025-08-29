@@ -109,15 +109,21 @@
             <h2 class="mb-3">⭐ 즐겨찾기 종목 요약</h2>
             <div class="card shadow-sm">
                 <ul class="list-group list-group-flush">
-                    <li class="list-group-item bg-transparent text-white d-flex justify-content-between">
-                        <span>삼성전자</span>
-                        <span class="text-success">75,000 ▲ 1.2%</span>
-                    </li>
-                    <li class="list-group-item bg-transparent text-white d-flex justify-content-between">
-                        <span>카카오</span>
-                        <span class="text-danger">55,000 ▼ 0.5%</span>
+                    <li th:each="stock : ${favorites}"
+                        class="list-group-item bg-transparent text-white d-flex justify-content-between">
+
+                        <!-- 종목 이름 -->
+                        <span th:text="${stock.name}"></span>
+
+                        <!-- 가격 + 변동률 -->
+                        <span th:text="${#numbers.formatDecimal(stock.price, 0, 0) + ' ' +
+                                        (stock.change != null and stock.change.compareTo(0) > 0 ? '▲' : '▼') + ' ' +
+                                        #numbers.formatDecimal(stock.changePercent != null ? stock.changePercent : 0, 1, 1) + '%'}"
+                                                  th:classappend="${stock.change != null and stock.change.compareTo(0) > 0} ? 'text-success' : 'text-danger'">
+                        </span>
                     </li>
                 </ul>
+
                 <div class="text-end mt-3">
                     <a href="/favorites" class="btn btn-outline-primary btn-sm">전체 보기</a>
                 </div>
