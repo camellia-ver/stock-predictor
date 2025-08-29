@@ -1,6 +1,6 @@
 package com.example.stock_predictor.service;
 
-import com.example.stock_predictor.dto.SignupDTO;
+import com.example.stock_predictor.dto.UserDTO;
 import com.example.stock_predictor.model.Role;
 import com.example.stock_predictor.model.User;
 import com.example.stock_predictor.repository.RoleRepository;
@@ -8,6 +8,7 @@ import com.example.stock_predictor.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,12 +20,42 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final RoleRepository roleRepository;
 
+    @Transactional
+    public User updateUser(Long userId, UserDTO request){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        if (!user.getEmail().equals(request.getEmail()) && userRepository.existsByEmail(request.getEmail())){
+            throw new IllegalArgumentException("이미 등록된 이메일입니다.");
+        }
+
+        String updatedPassword = (request.getPassword() != null && !request.getPassword().isEmpty())
+                ? passwordEncoder.encode(request.getPassword())
+                : user.getPasswordHash();
+
+        User updatedUser = User.builder()
+                .id(user.getId())
+                .userName(request.getUserName())
+                .email(request.getEmail())
+                .roles(user.getRoles())
+                .passwordHash(updatedPassword)
+                .createdAt(user.getCreatedAt())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        return userRepository.save(updatedUser);
+    }
+
+    public void deleteUser(String email){
+        userRepository.deleteByEmail(email);
+    }
+
     public User findByEmail(String email){
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다: " + email));
     }
 
-    public User signup(SignupDTO request){
+    public User signup(UserDTO request){
         if (userRepository.existsByEmail(request.getEmail())){
             throw new IllegalArgumentException("이미 등록된 이메일입니다.");
         }

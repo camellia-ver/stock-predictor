@@ -18,6 +18,8 @@ public class FavoriteService {
     private final FavoriteRepository favoriteRepository;
     private final UserRepository userRepository;
 
+
+
     public List<Favorite> getFavorites(String email, boolean limit){
         User currentUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
