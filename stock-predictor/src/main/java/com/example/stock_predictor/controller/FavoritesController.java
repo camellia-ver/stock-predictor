@@ -25,7 +25,7 @@ public class FavoritesController {
 
     @GetMapping("/favorites")
     public String favorites(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        List<Favorite> favorites = favoriteService.getFavorites(userDetails.getUsername());
+        List<Favorite> favorites = favoriteService.getFavorites(userDetails.getUsername(),false);
         List<StockWithPriceDTO> favoritesDTO = favorites.stream()
                 .map(f -> {
                     Optional<StockPrice> latestPriceOpt = stockPriceService.getLatestPrice(f.getStock());

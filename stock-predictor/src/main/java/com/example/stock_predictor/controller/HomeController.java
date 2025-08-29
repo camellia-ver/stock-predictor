@@ -53,7 +53,7 @@ public class HomeController {
             model.addAttribute("kosdaqIsRising", kosdaq.isRising());
             model.addAttribute("kosdaqRate", kosdaq.rate());
 
-            List<Favorite> favorites = favoriteService.getFavorites(userDetails.getUsername());
+            List<Favorite> favorites = favoriteService.getFavorites(userDetails.getUsername(), true);
             List<StockWithPriceDTO> favoritesDTO = favorites.stream()
                     .map(f -> {
                         Optional<StockPrice> latestPriceOpt = stockPriceService.getLatestPrice(f.getStock());
