@@ -43,3 +43,19 @@
 .error-card svg {
     flex-shrink: 0;
 }
+
+/* 두 버튼 라운드 통일 */
+#togglePassword, #toggleConfirmPassword {
+    border-radius: 0.375rem; /* Bootstrap 기본 버튼 라운드 */
+}
+
+/* input-group 안 버튼도 동일하게 */
+.input-group .btn {
+    border-radius: 0.375rem;
+}
+
+/* input과 버튼이 겹치지 않고 버튼만 라운드 */
+.input-group .form-control {
+    border-top-right-radius: 0.375rem;
+    border-bottom-right-radius: 0.375rem;
+}

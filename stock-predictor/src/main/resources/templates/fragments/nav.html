@@ -1,56 +1,52 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
-  <div class="container">
-    <a class="navbar-brand text-primary fw-bold" href="/">Stock Predictor</a>
+    <div class="container d-flex justify-content-between align-items-center">
+        <!-- 브랜드 -->
+        <a class="navbar-brand text-primary fw-bold" href="/">Stock Predictor</a>
 
-    <!-- 모바일용 토글 버튼 -->
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
-      aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+        <!-- 모바일 버튼 그룹 -->
+        <div class="d-flex d-lg-none align-items-center gap-2">
+            <!-- 모바일용 토글 버튼 (메뉴 열기) -->
+            <button class="btn btn-outline-secondary p-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+                    aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-    <!-- 접히는 메뉴 영역 -->
-    <div class="collapse navbar-collapse" id="navbarContent">
-      <!-- 왼쪽 메뉴 -->
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link" href="/favorites">즐겨찾기</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/memo">메모</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/setting">내 정보</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link text-danger" href="/logout" data-bs-toggle="modal" data-bs-target="#logoutModal">로그아웃</a>
-        </li>
-      </ul>
+            <!-- 모바일용 검색 버튼 -->
+            <button class="btn btn-outline-primary p-2" type="button" data-bs-toggle="collapse" data-bs-target="#mobileSearch"
+                    aria-expanded="false" aria-controls="mobileSearch">
+                🔍
+            </button>
+        </div>
 
-      <!-- 검색 아이콘 -->
-      <div class="d-flex align-items-center">
-        <button class="btn btn-outline-secondary d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#mobileSearch" aria-expanded="false" aria-label="Search">
-          🔍
-        </button>
+        <!-- PC/큰 화면 메뉴 영역 -->
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <!-- 왼쪽 메뉴 -->
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" href="/favorites">즐겨찾기</a></li>
+                <li class="nav-item"><a class="nav-link" href="/memo">메모</a></li>
+                <li class="nav-item"><a class="nav-link" href="/setting">내 정보</a></li>
+                <li class="nav-item"><a class="nav-link text-danger" href="/logout" data-bs-toggle="modal" data-bs-target="#logoutModal">로그아웃</a></li>
+            </ul>
 
-      <!-- PC용 검색폼 -->
-      <form class="d-none d-lg-flex ms-3 position-relative" role="search" id="searchForm" action="/search" method="get">
-          <input class="form-control me-2" type="search" placeholder="종목 검색" aria-label="Search" name="query" id="searchInput" autocomplete="off" required>
-          <button class="btn btn-outline-primary w-auto" type="submit" style="white-space: nowrap;">검색</button>
+            <!-- PC용 검색폼 -->
+            <form class="d-none d-lg-flex ms-3 position-relative" role="search" id="searchForm" action="/search" method="get">
+                <input class="form-control me-2" type="search" placeholder="종목 검색" aria-label="Search" name="query" id="searchInput" autocomplete="off" required>
+                <button class="btn btn-outline-primary w-auto" type="submit" style="white-space: nowrap;">검색</button>
 
-          <!-- 자동완성 드롭다운 -->
-          <ul class="list-group position-absolute w-100" id="autocompleteList" style="top: 100%; z-index: 1000;"></ul>
-      </form>
+                <!-- 자동완성 드롭다운 -->
+                <ul class="list-group position-absolute w-100" id="autocompleteList" style="top: 100%; z-index: 1000;"></ul>
+            </form>
+        </div>
 
-      <!-- 모바일 검색폼 -->
-      <div class="collapse" id="mobileSearch">
-          <form class="d-flex mt-2 position-relative" role="search" id="mobileSearchForm" action="/search" method="get">
-              <input class="form-control me-2" type="search" placeholder="종목 검색" aria-label="Search" name="query" id="mobileSearchInput" autocomplete="off" required>
-              <button class="btn btn-outline-primary w-auto" type="submit" style="white-space: nowrap;">검색</button>
+        <!-- 모바일 검색폼 (collapse) -->
+        <div class="collapse w-100 mt-2 mb-2" id="mobileSearch">
+            <form class="d-flex position-relative" role="search" id="mobileSearchForm" action="/search" method="get">
+                <input class="form-control me-2" type="search" placeholder="종목 검색" aria-label="Search" name="query" id="mobileSearchInput" autocomplete="off" required>
+                <button class="btn btn-outline-primary w-auto" type="submit" style="white-space: nowrap;">검색</button>
 
-              <!-- 자동완성 드롭다운 -->
-              <ul class="list-group position-absolute w-100" id="mobileAutocompleteList" style="top: 100%; z-index: 1000;"></ul>
-          </form>
-      </div>
-  </div>
+                <!-- 자동완성 드롭다운 -->
+                <ul class="list-group position-absolute w-100" id="mobileAutocompleteList" style="top: 100%; z-index: 1000;"></ul>
+            </form>
+        </div>
+    </div>
 </nav>
-

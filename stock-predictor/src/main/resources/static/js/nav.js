@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-
     async function fetchSuggestions(query) {
         if (!query) return [];
         const res = await fetch(`/api/stocks?query=${encodeURIComponent(query)}`);
@@ -101,4 +100,34 @@ document.addEventListener("DOMContentLoaded", () => {
     const mobileInput = document.getElementById("mobileSearchInput");
     const mobileList = document.getElementById("mobileAutocompleteList");
     if (mobileInput && mobileList) setupAutocomplete(mobileInput, mobileList);
+
+    // 화면 크기 변경 시 검색폼 상태 조정
+    function adjustNavbarOnResize() {
+        const mobileSearch = document.getElementById('mobileSearch');
+        const pcSearch = document.getElementById('searchForm');
+        const windowWidth = window.innerWidth;
+
+        if (windowWidth >= 992) { // lg 이상
+            // 모바일 검색창이 열려 있으면 닫기
+            if (mobileSearch.classList.contains('show')) {
+                const bsCollapse = bootstrap.Collapse.getInstance(mobileSearch);
+                if (bsCollapse) {
+                    bsCollapse.hide();
+                }
+            }
+            // PC 검색창 flex로 보이게
+            pcSearch.classList.remove('d-none');
+            pcSearch.classList.add('d-flex');
+        } else {
+            // PC 검색창 숨기기
+            pcSearch.classList.remove('d-flex');
+            pcSearch.classList.add('d-none');
+        }
+    }
+
+    // 이벤트 등록
+    window.addEventListener('resize', adjustNavbarOnResize);
+
+    // 초기 실행
+    adjustNavbarOnResize();
 });
