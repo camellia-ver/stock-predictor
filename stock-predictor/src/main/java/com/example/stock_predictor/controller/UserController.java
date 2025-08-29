@@ -1,6 +1,6 @@
 package com.example.stock_predictor.controller;
 
-import com.example.stock_predictor.dto.SignupRequest;
+import com.example.stock_predictor.dto.SignupDTO;
 import com.example.stock_predictor.model.User;
 import com.example.stock_predictor.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,7 +12,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
@@ -32,7 +31,7 @@ public class UserController {
     }
 
     @PostMapping("/signup")
-    public String signup(@Valid SignupRequest request, HttpServletRequest httpRequest,
+    public String signup(@Valid SignupDTO request, HttpServletRequest httpRequest,
                          RedirectAttributes redirectAttributes
     ){
         try {

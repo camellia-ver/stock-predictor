@@ -1,0 +1,60 @@
+/* 카드 배경 강화 */
+.card {
+    background-color: rgba(20, 20, 30, 0.95); /* 진한 배경 + 약간 투명 */
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+/* 검색 결과 항목 배경 및 hover */
+.list-group-item {
+    background-color: rgba(30, 30, 40, 0.9); /* 진하고 살짝 투명 */
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+    padding: 1rem 1.25rem;
+    transition: background 0.2s ease, transform 0.2s ease;
+    border: none;
+}
+
+.list-group-item:hover {
+    background-color: rgba(50, 50, 60, 0.95); /* hover 시 조금 더 진하게 */
+    transform: translateY(-2px);
+}
+
+/* 글자 대비 향상 */
+.list-group-item strong {
+    color: #ffffff; /* 이름/티커 밝게 */
+}
+
+.list-group-item small {
+    color: #cccccc; /* 섹터/시장 회색 */
+}
+
+/* 가격 변동 강조 */
+.price-change {
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.3rem;
+    font-weight: 600;
+    min-width: 70px;
+    text-align: center;
+    display: inline-block;
+}
+
+.price-up {
+    background-color: rgba(0, 128, 0, 0.25);
+    color: #00ff00;
+}
+
+.price-down {
+    background-color: rgba(255, 0, 0, 0.25);
+    color: #ff4444;
+}
+
+.price-up i {
+    color: #00ff00;  /* 연두색 */
+    margin-right: 2px;
+}
+
+.price-down i {
+    color: #ff4444;  /* 빨강 */
+    margin-right: 2px;
+}

@@ -1,6 +1,6 @@
 package com.example.stock_predictor.service;
 
-import com.example.stock_predictor.dto.SignupRequest;
+import com.example.stock_predictor.dto.SignupDTO;
 import com.example.stock_predictor.model.Role;
 import com.example.stock_predictor.model.User;
 import com.example.stock_predictor.repository.RoleRepository;
@@ -19,7 +19,7 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final RoleRepository roleRepository;
 
-    public User signup(SignupRequest request){
+    public User signup(SignupDTO request){
         if (userRepository.existsByEmail(request.getEmail())){
             throw new IllegalArgumentException("이미 등록된 이메일입니다.");
         }

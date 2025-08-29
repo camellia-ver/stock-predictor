@@ -10,8 +10,10 @@
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
     <link rel="stylesheet" href="/css/common.css" />
-    <link rel="stylesheet" href="/css/search.css" />
+    <link rel="stylesheet" href="/css/search-results.css" />
 
     <script src="/js/autocomplete.js"></script>
 </head>
@@ -35,26 +37,50 @@
 
     <!-- 검색 결과 -->
     <section>
-        <h2 class="mb-4">🔍 검색 결과: <span th:text="${query}"></span></h2>
-        <div class="card shadow-sm">
+        <h2 class="mb-4">
+            🔍 검색 결과: <span th:text="${query}"></span>
+        </h2>
+
+        <div class="card shadow-sm bg-dark border-0">
             <ul class="list-group list-group-flush">
-                <!-- 검색 결과 항목 반복 -->
-                <li class="list-group-item bg-transparent text-white d-flex justify-content-between align-items-center"
-                    th:each="stock : ${results}">
+
+                <!-- 검색 결과 반복 -->
+                <li class="list-group-item bg-transparent text-white d-flex justify-content-between align-items-center py-3"
+                    th:each="stock : ${results}"
+                    th:with="
+                        changeSign = ${stock.change} >= 0 ? '+' : '',
+                        percentSign = ${stock.changePercent} >= 0 ? '+' : '',
+                        changeIcon = ${stock.change} >= 0 ? '▲' : '▼',
+                        changeBg = ${stock.change} > 0 ? 'rgba(0, 128, 0, 0.15)' :
+                                (${stock.change} < 0 ? 'rgba(255, 0, 0, 0.15)' : 'transparent')">
+
                     <div>
-                        <strong class="text-primary" th:text="${stock.name} + ' (' + ${stock.ticker} + ')'"></strong><br>
-                        <small class="text-muted" th:text="${stock.sector} + ' · ' + ${stock.market}"></small>
+                        <strong class="text-light fs-5" th:text="${stock.name} + ' (' + ${stock.ticker} + ')'"></strong>
+                        <small class="text-secondary" th:text="${stock.sector} + ' · ' + ${stock.market}"></small>
+                        
+                        <span th:class="'price-change ' + (${stock.change} >= 0 ? 'price-up' : 'price-down')">
+                            <i th:class="${stock.change} >= 0 ? 'bi bi-caret-up-fill' : 'bi bi-caret-down-fill'"></i>
+                            <span th:text="changeSign + ${stock.change} + '원'"></span>,
+                            <span th:text="percentSign + ${stock.changePercent} + '%'"></span>
+                        </span>
                     </div>
+
+                    <!-- 상세보기 버튼 -->
                     <div class="text-end">
-                        <a th:href="@{'/stock/' + ${stock.ticker}}" class="btn btn-outline-light btn-sm mt-2">상세보기</a>
+                        <a th:href="@{'/stock/' + ${stock.ticker}}"
+                        class="btn btn-outline-light btn-sm">
+                            상세보기
+                        </a>
                     </div>
+
                 </li>
 
-                <!-- 검색 결과가 없는 경우 -->
-                <li class="list-group-item bg-transparent text-white text-center"
+                <!-- 검색 결과 없음 -->
+                <li class="list-group-item bg-transparent text-white text-center py-4"
                     th:if="${#lists.isEmpty(results)}">
                     검색 결과가 없습니다.
                 </li>
+
             </ul>
         </div>
     </section>
