@@ -19,6 +19,11 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final RoleRepository roleRepository;
 
+    public User findByEmail(String email){
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다: " + email));
+    }
+
     public User signup(SignupDTO request){
         if (userRepository.existsByEmail(request.getEmail())){
             throw new IllegalArgumentException("이미 등록된 이메일입니다.");

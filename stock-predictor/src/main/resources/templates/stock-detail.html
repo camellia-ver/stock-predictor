@@ -27,9 +27,11 @@
         <div>
             <h2 class="mb-1" th:text="${stock.name} + ' (' + ${stock.ticker} + ')'"></h2>
         </div>
-        <div>
-            <button class="btn btn-outline-warning favorite-btn">⭐ 즐겨찾기</button>
-        </div>
+        <button
+                class="btn btn-outline-warning favorite-btn [[${isFavorite} ? 'active' : '']]]"
+                data-ticker="${stock.ticker}">
+            ⭐ 즐겨찾기
+        </button>
     </section>
 
     <!-- 가격 차트 -->
