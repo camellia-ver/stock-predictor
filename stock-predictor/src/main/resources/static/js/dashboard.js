@@ -110,13 +110,25 @@ document.addEventListener("DOMContentLoaded", () => {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
+          zoom:{
+            pan:{
+              enabled:true,
+              mode:"x", // X축만 이동
+              modifierKey:"ctrl" // Ctrl 누르고 드래그해야 팬
+            },
+            zoom:{
+              wheel:{enabled:true}, // 마우스 휠로 줌
+              pinch:{enabled:true}, // 터치 핀치 줌
+              mode:"x"
+            }
+          },
           legend: { display: true },
           tooltip: {
             mode: "index",
             intersect: false,
             callbacks: {
               label: (ctx) => {
-                const v = ctx.raw; // 🔹 candlestick/bar 데이터 그대로 접근
+                const v = ctx.raw; // candlestick/bar 데이터 그대로 접근
                 if (ctx.dataset.label === "Volume") {
                   return `Volume: ${v.y.toLocaleString()}`;
                 }
