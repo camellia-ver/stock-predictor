@@ -1,4 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("helpBtn").addEventListener("click", () => {
+    const helpCard = document.getElementById("helpCard");
+    helpCard.style.display = helpCard.style.display === "none" ? "block" : "none";
+  });
+
   let chart;
   const indexSelector = document.getElementById("indexSelector");
   const tabs = document.querySelectorAll("#chartTab .nav-link");
@@ -77,7 +82,6 @@ document.addEventListener("DOMContentLoaded", () => {
         {
           label: indexName,
           data: candles,
-//          parsing: false,
           // 색상(업/다운) 설정: 플러그인 버전에 따라 자동 적용
           color: {
             up: "rgba(25,190,125,1)",

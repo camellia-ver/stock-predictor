@@ -36,3 +36,44 @@
   width: 100% !important;
   height: 420px !important; /* 원하는 고정 높이 */
 }
+
+/* 도움말 카드 */
+#helpCard {
+  display: none;              /* 기본 숨김 */
+  background: linear-gradient(135deg, #1E3A8A, #3B82F6); /* 파란색 그라데이션 */
+  color: #ffffff;             /* 글자 하얀색 */
+  border-radius: 12px;        /* 둥근 모서리 */
+  padding: 16px;              /* 안쪽 여백 */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25); /* 그림자 */
+  font-size: 0.9rem;          /* 약간 작은 폰트 */
+  line-height: 1.5;           /* 줄 간격 */
+}
+
+/* 목록 스타일 */
+#helpCard ul {
+  padding-left: 1.2em;
+  margin: 8px 0 0 0;
+  list-style-type: disc;       /* 점 목록 */
+}
+
+/* 목록 아이템 강조 */
+#helpCard ul li {
+  margin-bottom: 6px;
+}
+
+/* 버튼 스타일 */
+#helpBtn {
+  background-color: #2563EB;  /* 진한 파란색 */
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+/* 버튼 호버 */
+#helpBtn:hover {
+  background-color: #1D4ED8;
+}

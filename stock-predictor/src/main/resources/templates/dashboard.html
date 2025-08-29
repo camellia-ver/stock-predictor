@@ -82,6 +82,21 @@
         <div class="card shadow-sm">
             <div class="card-body">
                 <canvas id="chartCanvas" style="background:rgba(255,255,255,0.1); border-radius:12px;"></canvas>
+                <div id="detailPanel" class="mt-2 small text-muted"></div>
+            </div>
+        </div>
+        
+        <button id="helpBtn" class="btn btn-outline-info btn-sm mt-2">📘 캔들 보는 법</button>
+
+        <div id="helpCard" class="card shadow-sm mt-2" style="display:none;">
+            <div class="card-body small">
+                <strong>캔들 해석 가이드</strong>
+                <ul class="mb-0">
+                <li>본체(직사각형): 시가~종가</li>
+                <li>윗꼬리/아랫꼬리: 고가/저가</li>
+                <li>색상: 상승(초록) / 하락(빨강)</li>
+                <li>거래량: 가격 움직임의 신뢰도</li>
+                </ul>
             </div>
         </div>
     </section>
