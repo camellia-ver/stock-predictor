@@ -17,6 +17,11 @@ import java.util.stream.Collectors;
 public class StockService {
     private final StockRepository stockRepository;
 
+    public Stock getStockByTicker(String ticker){
+        return stockRepository.findByTicker(ticker)
+                .orElseThrow(() -> new RuntimeException("종목을 찾을 수 없습니다."+ticker));
+    }
+
     @Transactional
     public void syncWithCsv(List<Stock> csvData) {
         // CSV에 있는 모든 ticker 수집

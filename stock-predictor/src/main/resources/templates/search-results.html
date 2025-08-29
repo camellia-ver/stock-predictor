@@ -67,7 +67,7 @@
 
                     <!-- 상세보기 버튼 -->
                     <div class="text-end">
-                        <a th:href="@{'/stock/' + ${stock.ticker}}"
+                        <a th:href="@{/stock-detail(ticker=${stock.ticker})}"
                         class="btn btn-outline-light btn-sm">
                             상세보기
                         </a>
