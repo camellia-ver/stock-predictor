@@ -14,6 +14,9 @@
     <link rel="stylesheet" href="/css/stock-detail.css">
 
     <script src="/js/stock-detail.js"></script>
+
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
 </head>
 <body>
 <header>
@@ -28,8 +31,9 @@
             <h2 class="mb-1" th:text="${stock.name} + ' (' + ${stock.ticker} + ')'"></h2>
         </div>
         <button
-                class="btn btn-outline-warning favorite-btn [[${isFavorite} ? 'active' : '']]]"
-                data-ticker="${stock.ticker}">
+            class="btn btn-outline-warning favorite-btn"
+            th:classappend="${isFavorite} ? ' active' : ''"
+            th:data-ticker="${stock.ticker}">
             ⭐ 즐겨찾기
         </button>
     </section>
