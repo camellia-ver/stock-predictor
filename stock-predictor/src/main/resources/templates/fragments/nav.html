@@ -31,18 +31,26 @@
         <button class="btn btn-outline-secondary d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#mobileSearch" aria-expanded="false" aria-label="Search">
           🔍
         </button>
-        <!-- PC용 검색폼 -->
-        <form class="d-none d-lg-flex ms-3" role="search">
-          <input class="form-control me-2" type="search" placeholder="종목 검색" aria-label="Search">
-        </form>
-      </div>
-    </div>
 
-    <!-- 모바일 검색폼 (접힘) -->
-    <div class="collapse" id="mobileSearch">
-      <form class="d-flex mt-2" role="search">
-        <input class="form-control me-2" type="search" placeholder="종목 검색" aria-label="Search">
+      <!-- PC용 검색폼 -->
+      <form class="d-none d-lg-flex ms-3 position-relative" role="search" id="searchForm" action="/search" method="get">
+          <input class="form-control me-2" type="search" placeholder="종목 검색" aria-label="Search" name="query" id="searchInput" autocomplete="off" required>
+          <button class="btn btn-outline-primary" type="submit">검색</button>
+
+          <!-- 자동완성 드롭다운 -->
+          <ul class="list-group position-absolute w-100" id="autocompleteList" style="top: 100%; z-index: 1000;"></ul>
       </form>
-    </div>
+
+      <!-- 모바일 검색폼 -->
+      <div class="collapse" id="mobileSearch">
+          <form class="d-flex mt-2 position-relative" role="search" id="mobileSearchForm" action="/search" method="get">
+              <input class="form-control me-2" type="search" placeholder="종목 검색" aria-label="Search" name="query" id="mobileSearchInput" autocomplete="off" required>
+              <button class="btn btn-outline-primary" type="submit">검색</button>
+
+              <!-- 자동완성 드롭다운 -->
+              <ul class="list-group position-absolute w-100" id="mobileAutocompleteList" style="top: 100%; z-index: 1000;"></ul>
+          </form>
+      </div>
   </div>
 </nav>
+<script src="/js/autocomplete.js"></script>
