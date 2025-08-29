@@ -20,13 +20,15 @@ document.addEventListener("DOMContentLoaded", () => {
       const h = r.high ?? r.h ?? r.highPrice;
       const l = r.low ?? r.l ?? r.lowPrice;
       const c = r.close ?? r.c ?? r.closePrice;
+      const v = r.volume ?? r.v ?? r.vol;
 
       return {
-        x: new Date("2025-08-22").getTime(),
+        x: new Date(date).getTime(),
         o: Number(o),
         h: Number(h),
         l: Number(l),
         c: Number(c),
+        v: Number(v)
       };
     }).filter(d =>
       Number.isFinite(d.o) && Number.isFinite(d.h) &&
@@ -43,13 +45,26 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function computeSMA(candles, period) {
+    const res = [];
+    let sum = 0;
+    for (let i = 0; i < candles.length; i++) {
+      sum += candles[i].c;
+      if (i >= period) sum -= candles[i - period].c;
+      res.push({
+        x: candles[i].x,
+        y: i >= period - 1 ? sum / period : null
+      });
+    }
+    return res;
+  }
+
   async function loadChart(period = "week") {
     const indexName = indexSelector.value;
     const res = await fetch(`/api/index/${encodeURIComponent(indexName)}?period=${period}`);
     const data = await res.json();
 
     const candles = toCandles(data);
-    console.log("candles:", candles);
 
     const ctx = document.getElementById("chartCanvas").getContext("2d");
     if (chart) chart.destroy();
@@ -58,7 +73,8 @@ document.addEventListener("DOMContentLoaded", () => {
       type: "candlestick",
       data: {
         // 캔들 차트는 datasets만 사용합니다 (labels 불필요)
-        datasets: [{
+        datasets: [
+        {
           label: indexName,
           data: candles,
 //          parsing: false,
@@ -69,7 +85,26 @@ document.addEventListener("DOMContentLoaded", () => {
             unchanged: "rgba(128,128,128,1)"
           },
           borderColor: "rgba(0,0,0,0.6)"
-        }]
+        },
+        {
+          label:"Volume",
+          type:"bar",
+          data:candles.map(c=>({x:c.x, y:c.v ?? 0})),
+          yAxisID:"volume",
+          barPercentage:1.0,
+          categoryPercentage:1.0,
+          backgroundColor:"rgba(100,100,255,0.3)"
+        },
+        {
+          label: "MA20",
+          type: "line",
+          data: computeSMA(candles, 20),
+          borderColor: "orange",
+          borderWidth: 1.3,
+          pointRadius: 0,
+          tension: 0
+        }
+        ]
       },
       options: {
         responsive: true,
@@ -80,10 +115,15 @@ document.addEventListener("DOMContentLoaded", () => {
             mode: "index",
             intersect: false,
             callbacks: {
-              // 툴팁에 OHLC 보기 좋게 표시
               label: (ctx) => {
-                const v = ctx.raw;
-                return ` O:${v.o} H:${v.h} L:${v.l} C:${v.c}`;
+                const v = ctx.raw; // 🔹 candlestick/bar 데이터 그대로 접근
+                if (ctx.dataset.label === "Volume") {
+                  return `Volume: ${v.y.toLocaleString()}`;
+                }
+                const prev = ctx.dataset.data[ctx.dataIndex - 1];
+                const prevClose = prev ? prev.c : null;
+                const pct = prevClose ? ((v.c - prevClose) / prevClose * 100).toFixed(2) + "%" : "";
+                return `O:${v.o} H:${v.h} L:${v.l} C:${v.c} (${pct})`;
               }
             }
           }
@@ -102,6 +142,12 @@ document.addEventListener("DOMContentLoaded", () => {
             ticks: {
               callback: (v) => Number(v).toLocaleString()
             }
+          },
+          volume: {             
+            position: "left",
+            grid: { display: false },
+            ticks: { callback: v => v.toLocaleString() },
+            beginAtZero: true
           }
         }
       }
