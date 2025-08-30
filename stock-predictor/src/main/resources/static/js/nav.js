@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-
     async function fetchSuggestions(query) {
         if (!query) return [];
         const res = await fetch(`/api/stocks?query=${encodeURIComponent(query)}`);
@@ -7,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return await res.json(); // [{ name: "삼성전자", ticker: "005930" }, ...]
     }
 
-    function setupAutocomplete(inputEl, listEl, options = {}) {
+    function setupAutocomplete(inputEl, listEl) {
         let currentFocus = -1;
 
         async function updateDropdown() {
@@ -25,23 +24,28 @@ document.addEventListener("DOMContentLoaded", () => {
                 li.style.cursor = "pointer";
 
                 li.addEventListener("click", () => {
-                    if (options.onSelect) {
-                        options.onSelect(stock);
-                    } else {
-                        inputEl.value = `${stock.name} (${stock.ticker})`;
-                    }
-                    listEl.innerHTML = "";
+                    // 클릭 시 바로 stock-detail 페이지로 이동
+                    window.location.href = `/stock-detail?ticker=${stock.ticker}`;
                 });
 
                 listEl.appendChild(li);
             });
 
-            if (suggestions.length > 0) {
-                listEl.style.display = "block";
-                listEl.style.maxHeight = "150px";
-                listEl.style.overflowY = "auto";
-            } else {
-                listEl.style.display = "none";
+            // 위치 및 높이 조정
+            const rect = inputEl.getBoundingClientRect();
+            const windowHeight = window.innerHeight;
+            const spaceBelow = windowHeight - rect.bottom - 10;
+            listEl.style.top = inputEl.offsetHeight + "px";
+            listEl.style.maxHeight = spaceBelow > 150 ? "150px" : spaceBelow + "px";
+            listEl.style.overflowY = "auto";
+            listEl.style.display = "block";
+
+            // 모바일 키보드 대응
+            if (window.innerWidth < 992) {
+                const dropdownBottom = rect.top + inputEl.offsetHeight + listEl.offsetHeight;
+                if (dropdownBottom > windowHeight) {
+                    window.scrollBy(0, dropdownBottom - windowHeight + 10);
+                }
             }
         }
 
@@ -57,7 +61,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 currentFocus--;
                 addActive(items);
             } else if (e.key === "Enter") {
-                e.preventDefault(); // Enter 시 자동완성 선택 방지
+                e.preventDefault();
+                if (currentFocus > -1 && items[currentFocus]) {
+                    // 선택된 자동완성 항목이 있으면 클릭
+                    items[currentFocus].click();
+                } else if (inputEl.value.trim() !== "") {
+                    // 선택된 항목이 없으면 입력값 기반으로 검색 페이지 이동
+                    window.location.href = `/search?query=${encodeURIComponent(inputEl.value.trim())}`;
+                }
             }
         });
 
@@ -83,26 +94,43 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // ticker-input 자동완성 적용
-    const tickerInput = document.getElementById("ticker-input");
-    const tickerList = document.getElementById("ticker-autocomplete-list");
+    // PC
+    const pcInput = document.getElementById("searchInput");
+    const pcList = document.getElementById("autocompleteList");
+    if (pcInput && pcList) setupAutocomplete(pcInput, pcList);
 
-    if (tickerInput && tickerList) {
-        setupAutocomplete(tickerInput, tickerList, {
-            onSelect: (stock) => {
-                // 클릭 시 input에 값만 넣기
-                tickerInput.value = `${stock.name} (${stock.ticker})`;
+    // 모바일
+    const mobileInput = document.getElementById("mobileSearchInput");
+    const mobileList = document.getElementById("mobileAutocompleteList");
+    if (mobileInput && mobileList) setupAutocomplete(mobileInput, mobileList);
+
+    // 화면 크기 변경 시 검색폼 상태 조정
+    function adjustNavbarOnResize() {
+        const mobileSearch = document.getElementById('mobileSearch');
+        const pcSearch = document.getElementById('searchForm');
+        const windowWidth = window.innerWidth;
+
+        if (windowWidth >= 992) { // lg 이상
+            // 모바일 검색창이 열려 있으면 닫기
+            if (mobileSearch.classList.contains('show')) {
+                const bsCollapse = bootstrap.Collapse.getInstance(mobileSearch);
+                if (bsCollapse) {
+                    bsCollapse.hide();
+                }
             }
-        });
+            // PC 검색창 flex로 보이게
+            pcSearch.classList.remove('d-none');
+            pcSearch.classList.add('d-flex');
+        } else {
+            // PC 검색창 숨기기
+            pcSearch.classList.remove('d-flex');
+            pcSearch.classList.add('d-none');
+        }
     }
 
-    // 폼 제출 처리
-    const addFavoriteForm = document.getElementById("add-favorite-form");
-    addFavoriteForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const ticker = tickerInput.value.trim();
-        if (ticker) {
-            // 여기에 AJAX 요청이나 리스트 추가 처리
-        }
-    });
+    // 이벤트 등록
+    window.addEventListener('resize', adjustNavbarOnResize);
+
+    // 초기 실행
+    adjustNavbarOnResize();
 });
