@@ -79,4 +79,55 @@ document.addEventListener("DOMContentLoaded", () => {
                 strengthText.textContent = '';
             }
         });
+
+    // 즐겨찾기 제거
+        document.querySelectorAll('.remove-favorite-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const li = this.closest('li');
+                const ticker = li.getAttribute('data-ticker');
+
+                fetch('/api/favorites/toggle?ticker=' + ticker, {
+                    method: 'POST'
+                })
+                .then(res => {
+                    if (res.ok) {
+                        li.remove();
+                    } else if (res.status === 401) {
+                        alert('로그인이 필요합니다.');
+                    }
+                });
+            });
+        });
+
+        // 즐겨찾기 추가
+        document.getElementById('add-favorite-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const ticker = document.getElementById('ticker-input').value.trim();
+            if (!ticker) return;
+
+            fetch('/api/favorites/toggle?ticker=' + ticker, {
+                method: 'POST'
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.isFavorite) {
+                    const ul = document.getElementById('favorite-list');
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item bg-transparent text-white d-flex justify-content-between align-items-center';
+                    li.setAttribute('data-ticker', ticker);
+                    li.innerHTML = `
+                        <span>${ticker}</span>
+                        <button class="btn btn-sm btn-outline-danger remove-favorite-btn">제거</button>
+                    `;
+                    ul.appendChild(li);
+
+                    // 새로 추가된 버튼에 이벤트 재등록
+                    li.querySelector('.remove-favorite-btn').addEventListener('click', function () {
+                        fetch('/api/favorites/toggle?ticker=' + ticker, { method: 'POST' })
+                            .then(res => { if(res.ok) li.remove(); });
+                    });
+                }
+                document.getElementById('ticker-input').value = '';
+            });
+        });
 })

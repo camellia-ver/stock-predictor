@@ -1,8 +1,14 @@
 package com.example.stock_predictor.controller;
 
+import com.example.stock_predictor.dto.FavoriteDTO;
+import com.example.stock_predictor.dto.StockWithPriceDTO;
 import com.example.stock_predictor.dto.UserDTO;
+import com.example.stock_predictor.model.Favorite;
+import com.example.stock_predictor.model.StockPrice;
 import com.example.stock_predictor.model.User;
 import com.example.stock_predictor.repository.UserRepository;
+import com.example.stock_predictor.service.FavoriteService;
+import com.example.stock_predictor.service.StockPriceService;
 import com.example.stock_predictor.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,10 +30,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Controller
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final FavoriteService favoriteService;
     private final AuthenticationManager authenticationManager;
 
     @GetMapping("/setting")
@@ -38,6 +50,14 @@ public class UserController {
         dto.setEmail(user.getEmail());
 
         model.addAttribute("user",dto);
+
+        List<Favorite> favorites = favoriteService.getFavorites(userDetails.getUsername(), false);
+        List<FavoriteDTO> favoriteDTO = favorites.stream()
+                        .map(f -> new FavoriteDTO(f.getStock().getName(),f.getStock().getTicker()))
+                                .collect(Collectors.toList());
+
+        System.out.println(favoriteDTO);
+        model.addAttribute("favorites", favoriteDTO);
 
         return "user-settings";
     }

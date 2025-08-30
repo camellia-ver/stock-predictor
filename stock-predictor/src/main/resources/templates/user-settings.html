@@ -119,18 +119,17 @@
         <section class="col-lg-6">
             <h2 class="mb-3">⭐ 즐겨찾기 종목 관리</h2>
             <div class="card shadow-sm p-3">
-                <ul class="list-group list-group-flush mb-3">
-                    <li class="list-group-item bg-transparent text-white d-flex justify-content-between align-items-center">
-                        삼성전자
-                        <button class="btn btn-sm btn-outline-danger">제거</button>
-                    </li>
-                    <li class="list-group-item bg-transparent text-white d-flex justify-content-between align-items-center">
-                        카카오
-                        <button class="btn btn-sm btn-outline-danger">제거</button>
+                <ul id="favorite-list" class="list-group list-group-flush mb-3">
+                    <!-- 즐겨찾기 항목 반복 -->
+                    <li th:each="fav : ${favorites}"
+                        class="list-group-item bg-transparent text-white d-flex justify-content-between align-items-center"
+                        data-ticker="[[${fav.ticker}]]">
+                        <span th:text="${fav.name}">종목명</span>
+                        <button class="btn btn-sm btn-outline-danger remove-favorite-btn">제거</button>
                     </li>
                 </ul>
-                <form class="d-flex gap-2">
-                    <input type="text" class="form-control" placeholder="종목 추가">
+                <form id="add-favorite-form" class="d-flex gap-2">
+                    <input type="text" id="ticker-input" class="form-control" placeholder="종목 추가">
                     <button type="submit" class="btn btn-gradient">추가</button>
                 </form>
             </div>
