@@ -28,14 +28,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-    private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
 
     @GetMapping("/setting")
     public String setting(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        User user = userRepository.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
-
+        User user = userService.getUserByEmail(userDetails.getUsername());
         UserDTO dto = new UserDTO();
         dto.setUserName(user.getUserName());
         dto.setEmail(user.getEmail());
@@ -45,7 +42,7 @@ public class UserController {
         return "user-settings";
     }
 
-    @PostMapping("/update")
+    @PostMapping("/user/update")
     public String updateUser(@Valid UserDTO request,
                              BindingResult bindingResult,
                              @AuthenticationPrincipal UserDetails userDetails,
@@ -57,15 +54,29 @@ public class UserController {
             return "user-settings";
         }
 
-        User user = userRepository.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
-
-        userService.updateUser(user.getId(), request);
+        User user = userService.getUserByEmail(request.getEmail());
+        userService.updateUser(request);
 
         redirectAttributes.addFlashAttribute("success", "회원 정보가 업데이트되었습니다.");
         return "redirect:/setting";
     }
 
+    @PostMapping("/user/delete")
+    public String deleteUserAccount(Authentication auth,
+                                    HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    RedirectAttributes redirectAttributes){
+        User user = userService.getUserByEmail(auth.getName());
+        userService.deleteUser(user.getEmail());
+
+        SecurityContextHolder.clearContext();
+        if (request.getSession(false) != null){
+            request.getSession(false).invalidate();
+        }
+
+        redirectAttributes.addFlashAttribute("success", "회원탈퇴가 완료되었습니다.");
+        return "redirect:/";
+    }
 
     @GetMapping("/signup")
     public String signup(){

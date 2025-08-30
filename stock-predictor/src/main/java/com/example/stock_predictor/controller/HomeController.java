@@ -34,7 +34,7 @@ public class HomeController {
     @GetMapping("/")
     public String home(Model model, Authentication authentication,
                        @AuthenticationPrincipal UserDetails userDetails) {
-        if (authentication != null && authentication.isAuthenticated()) {
+        if (authentication != null && authentication.isAuthenticated() && userDetails != null) {
             StockIndexPrice kospiPrice = stockIndexPriceService.getLatestIndex("KOSPI");
             StockIndexPrice kosdaqPrice = stockIndexPriceService.getLatestIndex("KOSDAQ");
 

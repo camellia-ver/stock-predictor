@@ -20,10 +20,14 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final RoleRepository roleRepository;
 
-    @Transactional
-    public User updateUser(Long userId, UserDTO request){
-        User user = userRepository.findById(userId)
+    public User getUserByEmail(String email){
+        return userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+    }
+
+    @Transactional
+    public User updateUser(UserDTO request){
+        User user = getUserByEmail(request.getEmail());
 
         if (!user.getEmail().equals(request.getEmail()) && userRepository.existsByEmail(request.getEmail())){
             throw new IllegalArgumentException("이미 등록된 이메일입니다.");
@@ -46,6 +50,7 @@ public class UserService {
         return userRepository.save(updatedUser);
     }
 
+    @Transactional
     public void deleteUser(String email){
         userRepository.deleteByEmail(email);
     }

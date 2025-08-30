@@ -35,7 +35,7 @@
         <section class="col-lg-6">
             <h2 class="mb-3">👤 회원 정보 수정</h2>
             <div class="card shadow-sm p-3">
-                <form th:action="@{/update}" method="post" th:object="${user}">
+                <form th:action="@{/user/update}" method="post" th:object="${user}">
                     <!-- 사용자명 -->
                     <div class="mb-3">
                         <label for="userName" class="form-label">사용자명</label>
@@ -107,7 +107,9 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                        <a href="/user/delete" class="btn btn-danger">탈퇴</a>
+                        <form th:action="@{/user/delete}" method="post">
+                            <button type="submit" class="btn btn-danger">탈퇴</button>
+                        </form>
                     </div>
                 </div>
             </div>
