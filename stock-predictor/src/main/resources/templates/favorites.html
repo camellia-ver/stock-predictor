@@ -57,26 +57,28 @@
                 </tr>
                 </thead>
                 <tbody>
-                    <tr th:each="stock : ${favorites}">
+                    <tr th:each="stock : ${favorites}"
+                        style="cursor:pointer"
+                        th:attr="data-ticker=${stock.ticker}"
+                        onclick="location.href='/stock-detail?ticker=' + this.dataset.ticker">
+
                         <td class="fw-bold text-primary" th:text="${stock.name}"></td>
                         <td class="text-end" th:text="${#numbers.formatDecimal(stock.price,0,'COMMA',0,'POINT')}"></td>
                         <td class="text-end">
                             <span th:if="${stock.changePercent != null and stock.changePercent > 0}"
-                                class="text-success"
-                                th:text="'▲ ' + ${#numbers.formatDecimal(stock.changePercent,1,1)} + '%'">
+                                  class="text-success"
+                                  th:text="'▲ ' + ${#numbers.formatDecimal(stock.changePercent,1,1)} + '%'">
                             </span>
-
                             <span th:if="${stock.changePercent != null and stock.changePercent < 0}"
-                                class="text-danger"
-                                th:text="'▼ ' + ${#numbers.formatDecimal(stock.changePercent,1,1)} + '%'">
+                                  class="text-danger"
+                                  th:text="'▼ ' + ${#numbers.formatDecimal(stock.changePercent,1,1)} + '%'">
                             </span>
-
-                            <span th:if="${stock.changePercent == null}"
-                                th:text="'-'">
-                            </span>
+                            <span th:if="${stock.changePercent == null}" th:text="'-'"></span>
                         </td>
                         <td class="text-center memo-btn-cell">
-                            <a th:href="@{/memo/{id}(id=${stock.ticker})}" class="btn btn-sm btn-outline-primary">보기</a>
+                            <a th:href="@{/memo/{id}(id=${stock.ticker})}"
+                               class="btn btn-sm btn-outline-primary"
+                               onclick="event.stopPropagation()">보기</a>
                         </td>
                     </tr>
                 </tbody>
