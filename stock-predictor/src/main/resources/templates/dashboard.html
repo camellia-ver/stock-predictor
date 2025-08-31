@@ -111,16 +111,18 @@
                 <ul class="list-group list-group-flush">
                     <li th:each="stock : ${favorites}"
                         class="list-group-item bg-transparent text-white d-flex justify-content-between">
+                        <a th:href="@{/stock-detail(ticker=${stock.ticker})}"
+                           class="d-flex justify-content-between text-white text-decoration-none w-100">
+                            <!-- 종목 이름 -->
+                            <span th:text="${stock.name}"></span>
 
-                        <!-- 종목 이름 -->
-                        <span th:text="${stock.name}"></span>
-
-                        <!-- 가격 + 변동률 -->
-                        <span th:text="${#numbers.formatDecimal(stock.price, 0, 0) + ' ' +
-                                        (stock.change != null and stock.change.compareTo(0) > 0 ? '▲' : '▼') + ' ' +
-                                        #numbers.formatDecimal(stock.changePercent != null ? stock.changePercent : 0, 1, 1) + '%'}"
-                                                  th:classappend="${stock.change != null and stock.change.compareTo(0) > 0} ? 'text-success' : 'text-danger'">
-                        </span>
+                            <!-- 가격 + 변동률 -->
+                            <span th:text="${#numbers.formatDecimal(stock.price, 0, 0) + ' ' +
+                                            (stock.change != null and stock.change.compareTo(0) > 0 ? '▲' : '▼') + ' ' +
+                                            #numbers.formatDecimal(stock.changePercent != null ? stock.changePercent : 0, 1, 1) + '%'}"
+                                                      th:classappend="${stock.change != null and stock.change.compareTo(0) > 0} ? 'text-success' : 'text-danger'">
+                            </span>
+                        </a>
                     </li>
                 </ul>
 
