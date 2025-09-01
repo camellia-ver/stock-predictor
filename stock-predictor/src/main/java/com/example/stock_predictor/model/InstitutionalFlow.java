@@ -26,8 +26,13 @@ public class InstitutionalFlow {
 
     private Long foreignBuy;
     private Long foreignSell;
+    private Long foreignNetBuy; // 외국인 순매수
+
     private Long institutionBuy;
     private Long institutionSell;
+    private Long institutionNetBuy; // 기관 순매수
+
     private Long individualBuy;
     private Long individualSell;
+    private Long individualNetBuy; // 개인 순매순
 }
