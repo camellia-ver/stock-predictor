@@ -1,23 +1,19 @@
 /* ----------------- 탭 차트 높이 및 대비 ----------------- */
 .chart-area {
     position: relative;
-    width: 100%;          /* 부모 폭에 맞춤 */
-    margin: 0 auto;       /* 중앙 정렬 */
+    width: 100%;
+    margin: 0 auto;
     padding: 20px;
-    background-color: #fafafa; /* 배경 살짝 연하게 */
+    background-color: #fafafa;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    height: 600px;
 }
 
-/* canvas 높이 설정 */
+/* canvas 높이 */
 #priceChart {
-    height: 400px !important;  /* 기본 400px로 충분히 크게 */
+    height: 100% !important; /* 부모 높이를 100%로 채움 */
     width: 100% !important;
-}
-
-/* 레이블 글씨 작게 */
-.chart-area .chartjs-render-monitor {
-    font-size: 14px;
 }
 
 /* ----------------- 지표 카드 스타일 ----------------- */
@@ -157,4 +153,52 @@
     border-color: transparent;
     transform: translateY(-2px) scale(1.05);
     box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+}
+
+/* 도움말 카드 */
+#helpCard {
+  display: none;              /* 기본 숨김 */
+  background: linear-gradient(135deg, #1E3A8A, #3B82F6); /* 파란색 그라데이션 */
+  color: #ffffff;             /* 글자 하얀색 */
+  border-radius: 12px;        /* 둥근 모서리 */
+  padding: 16px;              /* 안쪽 여백 */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25); /* 그림자 */
+  font-size: 0.9rem;          /* 약간 작은 폰트 */
+  line-height: 1.5;           /* 줄 간격 */
+}
+
+/* 목록 스타일 */
+#helpCard ul {
+  padding-left: 1.2em;
+  margin: 8px 0 0 0;
+  list-style-type: disc;       /* 점 목록 */
+}
+
+/* 목록 아이템 강조 */
+#helpCard ul li {
+  margin-bottom: 6px;
+}
+
+/* 버튼 스타일 */
+#helpBtn {
+  background-color: #2563EB;  /* 진한 파란색 */
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+/* 버튼 호버 */
+#helpBtn:hover {
+  background-color: #1D4ED8;
+}
+
+#detailPanel {
+  white-space: pre-wrap;
+  color: black;
+  background-color: white;
+  padding: 5px;
 }

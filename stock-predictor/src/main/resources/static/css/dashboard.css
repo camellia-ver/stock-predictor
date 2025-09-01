@@ -34,7 +34,7 @@
 
 #chartCanvas {
   width: 100% !important;
-  height: 420px !important; /* 원하는 고정 높이 */
+  height: 420px !important;
 }
 
 /* 도움말 카드 */

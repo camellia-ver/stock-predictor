@@ -46,24 +46,36 @@
     </section>
 
     <!-- 가격 차트 -->
-    <section class="mb-4"
-             id="chartSection"
-             th:data-ticker="${stock.ticker}">
+    <section class="mb-4" id="chartSection" th:data-ticker="${stock.ticker}">
         <h4 class="mb-3">📈 가격 차트</h4>
         <ul class="nav nav-tabs mb-2" id="chartTab" role="tablist">
             <li class="nav-item">
-                <button class="nav-link active" data-period="week" data-bs-toggle="tab" data-bs-target="#chart">1주</button>
+                <button class="nav-link active" id="week-tab" data-period="week" data-bs-toggle="tab">1주</button>
             </li>
             <li class="nav-item">
-                <button class="nav-link" data-period="month" data-bs-toggle="tab" data-bs-target="#chart">1개월</button>
+                <button class="nav-link" id="month-tab" data-period="month" data-bs-toggle="tab">1개월</button>
             </li>
             <li class="nav-item">
-                <button class="nav-link" data-period="year" data-bs-toggle="tab" data-bs-target="#chart">1년</button>
+                <button class="nav-link" id="year-tab" data-period="year" data-bs-toggle="tab">1년</button>
             </li>
         </ul>
         <div class="tab-content">
             <div class="tab-pane fade show active chart-area" id="chart">
-                <canvas id="priceChart"></canvas>
+                <canvas id="candleChart"></canvas>
+            </div>
+        </div>
+        <div id="detailPanel" style="margin-top:10px;"></div>
+        <button id="helpBtn" class="btn btn-outline-info btn-sm mt-2">📘 캔들 보는 법</button>
+
+        <div id="helpCard" class="card shadow-sm mt-2" style="display:none;">
+            <div class="card-body small">
+                <strong>캔들 해석 가이드</strong>
+                <ul class="mb-0">
+                    <li>본체(직사각형): 시가~종가</li>
+                    <li>윗꼬리/아랫꼬리: 고가/저가</li>
+                    <li>색상: 상승(초록) / 하락(빨강)</li>
+                    <li>거래량: 가격 움직임의 신뢰도</li>
+                </ul>
             </div>
         </div>
     </section>
