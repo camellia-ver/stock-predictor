@@ -3,9 +3,11 @@ package com.example.stock_predictor.service;
 import com.example.stock_predictor.model.Stock;
 import com.example.stock_predictor.model.StockIndexPrice;
 import com.example.stock_predictor.model.StockPrice;
+import com.example.stock_predictor.model.ValuationMetric;
 import com.example.stock_predictor.repository.StockIndexPriceRepository;
 import com.example.stock_predictor.repository.StockPriceRepository;
 import com.example.stock_predictor.repository.StockRepository;
+import com.example.stock_predictor.repository.ValuationMetricRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,7 @@ public class StockDataLoader {
     private final StockRepository stockRepository;
     private final StockPriceRepository stockPriceRepository;
     private final StockIndexPriceRepository stockIndexPriceRepository;
+    private final ValuationMetricRepository valuationMetricRepository;
     private final EntityManager em;
 
     public List<Stock> loadStockListCsv(String filePath) throws IOException {
@@ -186,6 +189,65 @@ public class StockDataLoader {
         }
         return stockRepository.findByTickerIn(tickers).stream()
                 .collect(Collectors.toMap(Stock::getTicker, Function.identity()));
+    }
+
+    @Transactional
+    public void loadValuationMetricCsv(String filePath) throws IOException{
+        if (!checkFileExistsOrSkip(filePath)){
+            return;
+        }
+
+        Map<String, Stock> stockCache = loadStockCache(filePath);
+
+        List<ValuationMetric> buffer = new ArrayList<>(BATCH_SIZE);
+        try (Stream<String> lines = Files.lines(Paths.get(filePath))){
+            final Iterator<String> it = lines.skip(1).iterator();
+            while(it.hasNext()){
+                String line = it.next();
+                String[] cols = line.split(",",-1);
+                if (cols.length < 9) continue;
+
+                LocalDate date;
+                try{
+                    date = LocalDate.parse(cols[0]);
+                }catch (DateTimeParseException e){continue;}
+
+                String ticker = cols[1];
+                Stock stock = stockCache.get(ticker);
+                if (stock == null) continue;
+
+                BigDecimal roe = parseBigDecimal(cols[2]);
+                BigDecimal per = parseBigDecimal(cols[3]);
+                BigDecimal pbr = parseBigDecimal(cols[4]);
+                BigDecimal eps = parseBigDecimal(cols[5]);
+                BigDecimal bps = parseBigDecimal(cols[6]);
+                BigDecimal dividendYield = parseBigDecimal(cols[7]);
+
+                buffer.add(ValuationMetric.builder()
+                        .stock(stock)
+                        .date(date)
+                        .roe(roe)
+                        .per(per)
+                        .pbr(pbr)
+                        .eps(eps)
+                        .bps(bps)
+                        .dividendYield(dividendYield)
+                        .build());
+
+                if (buffer.size() >= BATCH_SIZE){
+                    valuationMetricRepository.saveAll(buffer);
+                    em.flush();
+                    em.clear();
+                    buffer.clear();
+                }
+            }
+        }
+
+        if (!buffer.isEmpty()){
+            valuationMetricRepository.saveAll(buffer);
+            em.flush();
+            em.clear();
+        }
     }
 
     private boolean checkFileExistsOrSkip(String filePath){

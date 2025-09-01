@@ -89,6 +89,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if(chart) chart.destroy();
 
+        // y축 범위 자동 계산
+        const ohlcValues = candles.flatMap(c => [c.o, c.h, c.l, c.c]);
+        const minPrice = Math.min(...ohlcValues);
+        const maxPrice = Math.max(...ohlcValues);
+
+        // 볼륨 범위 자동 계산
+        const volumes = candles.map(c => c.v ?? 0);
+        const maxVolume = Math.max(...volumes);
+
         chart = new Chart(ctx, {
             type: "candlestick",
             data: {
@@ -151,8 +160,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 },
                 scales: {
                     x: { type:"time", time: { unit: inferTimeUnit(period) }, ticks:{ maxRotation:0, autoSkip:true } },
-                    y: { position:"right" },
-                    volume: { position:"left", beginAtZero:true, grid:{ display:false } }
+                    y: {
+                        position:"right",
+                        beginAtZero: false,
+                        suggestedMin: minPrice * 0.95,
+                        suggestedMax: maxPrice * 1.05
+                    },
+                    volume: {
+                        position:"left",
+                        beginAtZero:true,
+                        suggestedMax: maxVolume * 1.2,
+                        grid:{ display:false }
+                    }
                 },
                 onClick: (evt) => {
                     const elements = chart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, false);
