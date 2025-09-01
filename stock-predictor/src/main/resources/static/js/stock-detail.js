@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const data = await response.json();
         if (!data || data.length === 0) return;
 
-        const stockName = data[0].name; // ← API에서 내려준 name 사용
+        const stockName = data[0].name;
         const candles = toCandles(data);
 
         if(chart) chart.destroy();
@@ -173,6 +173,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // -------------------- 초기 로드 --------------------
     loadChart("week");
+
+    // -------------------- 리셋 줌 버튼 --------------------
+    const resetZoomBtn = document.getElementById("resetZoomBtn");
+    if(resetZoomBtn){
+        resetZoomBtn.addEventListener("click", () => {
+            if(chart) chart.resetZoom(); // chartjs-plugin-zoom 메서드
+        });
+    }
 
     // -------------------- 탭 클릭 이벤트 --------------------
     document.querySelectorAll('#chartTab button').forEach(btn=>{

@@ -4,6 +4,10 @@ document.addEventListener("DOMContentLoaded", () => {
     helpCard.style.display = helpCard.style.display === "none" ? "block" : "none";
   });
 
+  document.getElementById("resetZoomBtn").addEventListener("click", () => {
+    if (chart) chart.resetZoom(); // chartjs-plugin-zoom 메서드
+  });
+
   let chart;
   const indexSelector = document.getElementById("indexSelector");
   const tabs = document.querySelectorAll("#chartTab .nav-link");
