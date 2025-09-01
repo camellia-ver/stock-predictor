@@ -6,6 +6,8 @@ import com.example.stock_predictor.repository.StockPriceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -15,5 +17,9 @@ public class StockPriceService {
 
     public Optional<StockPrice> getLatestPrice(Stock stock){
         return stockPriceRepository.findTopByStockOrderByDateDesc(stock);
+    }
+
+    public List<StockPrice> getPrice(Stock stock, LocalDate fromDate){
+        return stockPriceRepository.findByStockAndDateAfterOrderByDateAsc(stock, fromDate);
     }
 }

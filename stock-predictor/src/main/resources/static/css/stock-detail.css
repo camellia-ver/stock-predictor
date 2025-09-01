@@ -1,12 +1,23 @@
 /* ----------------- 탭 차트 높이 및 대비 ----------------- */
 .chart-area {
-    height: 300px;
-    background: rgba(0,0,0,0.3);
+    position: relative;
+    width: 100%;          /* 부모 폭에 맞춤 */
+    margin: 0 auto;       /* 중앙 정렬 */
+    padding: 20px;
+    background-color: #fafafa; /* 배경 살짝 연하게 */
     border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* canvas 높이 설정 */
+#priceChart {
+    height: 400px !important;  /* 기본 400px로 충분히 크게 */
+    width: 100% !important;
+}
+
+/* 레이블 글씨 작게 */
+.chart-area .chartjs-render-monitor {
+    font-size: 14px;
 }
 
 /* ----------------- 지표 카드 스타일 ----------------- */
@@ -26,13 +37,6 @@
     align-items: center;
     justify-content: center;
     color: #ffffff;
-}
-
-/* ----------------- 뉴스 리스트 ----------------- */
-.news-item {
-    border-bottom: 1px solid rgba(255,255,255,0.4);
-    padding: 0.5rem 0;
-    color: #f8f8f8;
 }
 
 /* ----------------- 메모 박스 ----------------- */

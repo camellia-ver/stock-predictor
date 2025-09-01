@@ -22,7 +22,6 @@ public class StockDetailController {
     public String stockDetail(@RequestParam String ticker, Model model,
                               @AuthenticationPrincipal UserDetails userDetails
                               ){
-        // ticker에 맞는 종목 정보 조회
         Stock stock = stockService.getStockByTicker(ticker);
         model.addAttribute("stock",stock);
 
