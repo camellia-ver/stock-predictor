@@ -1,5 +1,6 @@
 package com.example.stock_predictor.api;
 
+import com.example.stock_predictor.dto.StockPriceByTickerDTO;
 import com.example.stock_predictor.model.Stock;
 import com.example.stock_predictor.model.StockPrice;
 import com.example.stock_predictor.service.StockPriceService;
@@ -18,8 +19,8 @@ public class StockPriceApiController {
     private final StockPriceService stockPriceService;
 
     @GetMapping("/{ticker}/prices")
-    public List<StockPrice> getStockPrice(@PathVariable String ticker,
-                                          @RequestParam String period){
+    public List<StockPriceByTickerDTO> getStockPrice(@PathVariable String ticker,
+                                                     @RequestParam String period){
         Stock stock = stockService.getStockByTicker(ticker);
 
         LocalDate fromDate = switch (period){
@@ -28,6 +29,19 @@ public class StockPriceApiController {
             default -> LocalDate.now().minusWeeks(1);
         };
 
-        return stockPriceService.getPrice(stock, fromDate);
+        List<StockPrice> prices = stockPriceService.getPrice(stock, fromDate);
+
+        return prices.stream()
+                .map(p -> new StockPriceByTickerDTO(
+                        p.getDate(),
+                        p.getOpenPrice(),
+                        p.getHighPrice(),
+                        p.getLowPrice(),
+                        p.getClosePrice(),
+                        p.getVolume(),
+                        p.getChangeRate(),
+                        stock.getName()
+                ))
+                .toList();
     }
 }

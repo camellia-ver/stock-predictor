@@ -82,6 +82,9 @@ document.addEventListener("DOMContentLoaded", () => {
     async function loadChart(period = "week") {
         const response = await fetch(`/api/stock-prices/${ticker}/prices?period=${period}`);
         const data = await response.json();
+        if (!data || data.length === 0) return;
+
+        const stockName = data[0].name; // ← API에서 내려준 name 사용
         const candles = toCandles(data);
 
         if(chart) chart.destroy();
@@ -91,7 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
             data: {
                 datasets: [
                     {
-                        label: ticker,
+                        label: stockName,
                         data: candles,
                         color: { up: "rgba(25,190,125,1)", down: "rgba(235,90,90,1)" },
                         borderColor: "rgba(0,0,0,0.6)"
@@ -159,7 +162,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     if(d.o!==undefined){
                         const date = new Date(d.x);
                         document.getElementById("detailPanel").innerHTML = `
-                            <strong>${ticker} (${date.toLocaleDateString()})</strong><br>
+                            <strong>${stockName} (${date.toLocaleDateString()})</strong><br>
                             O: ${d.o} / H: ${d.h} / L: ${d.l} / C: ${d.c} / V: ${d.v ?? "-"}
                         `;
                     }
