@@ -159,7 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
               callback: (v) => Number(v).toLocaleString()
             }
           },
-          volume: {             
+          volume: {
             position: "left",
             grid: { display: false },
             ticks: { callback: v => v.toLocaleString() },
