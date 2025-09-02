@@ -40,13 +40,14 @@ def get_korea_valuation(start_date, end_date, batch_size=50, sleep_sec=1):
 
             df = df.reset_index()
             df['ticker'] = ticker
-            df['ROE'] = df['EPS'] / df['BPS'] * 100
+            df['roe'] = df['EPS'] / df['BPS'] * 100
 
             df = df.rename(columns={
                 'PER': 'per',
                 'PBR': 'pbr',
                 'EPS': 'eps',
                 'BPS': 'bps',
+                'DPS':  'dps',
                 'DIV': 'dividendYield',
                 '날짜': 'date'
             })

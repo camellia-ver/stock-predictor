@@ -9,6 +9,7 @@ import com.example.stock_predictor.repository.StockPriceRepository;
 import com.example.stock_predictor.repository.StockRepository;
 import com.example.stock_predictor.repository.ValuationMetricRepository;
 import jakarta.persistence.EntityManager;
+import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -212,16 +213,17 @@ public class StockDataLoader {
                     date = LocalDate.parse(cols[0]);
                 }catch (DateTimeParseException e){continue;}
 
-                String ticker = cols[1];
+                String ticker = cols[7];
                 Stock stock = stockCache.get(ticker);
                 if (stock == null) continue;
 
-                BigDecimal roe = parseBigDecimal(cols[2]);
-                BigDecimal per = parseBigDecimal(cols[3]);
-                BigDecimal pbr = parseBigDecimal(cols[4]);
-                BigDecimal eps = parseBigDecimal(cols[5]);
-                BigDecimal bps = parseBigDecimal(cols[6]);
-                BigDecimal dividendYield = parseBigDecimal(cols[7]);
+                BigDecimal roe = parseBigDecimal(cols[8]);
+                BigDecimal per = parseBigDecimal(cols[2]);
+                BigDecimal pbr = parseBigDecimal(cols[3]);
+                BigDecimal eps = parseBigDecimal(cols[4]);
+                BigDecimal bps = parseBigDecimal(cols[1]);
+                BigDecimal dps = parseBigDecimal(cols[6]);
+                BigDecimal dividendYield = parseBigDecimal(cols[5]);
 
                 buffer.add(ValuationMetric.builder()
                         .stock(stock)
@@ -231,6 +233,7 @@ public class StockDataLoader {
                         .pbr(pbr)
                         .eps(eps)
                         .bps(bps)
+                        .dps(dps)
                         .dividendYield(dividendYield)
                         .build());
 
@@ -259,8 +262,15 @@ public class StockDataLoader {
         return true;
     }
 
-    private BigDecimal parseBigDecimal(String value) {
-        return (value == null || value.isEmpty()) ? BigDecimal.ZERO : new BigDecimal(value);
+    private BigDecimal parseBigDecimal(String s) {
+        if (s == null || s.isEmpty()) return BigDecimal.ZERO;
+        s = s.trim();
+        try {
+            return new BigDecimal(s);
+        } catch (NumberFormatException e) {
+            System.err.println("숫자로 변환 불가: " + s);
+            return null;
+        }
     }
 
     private Long parseLong(String value) {

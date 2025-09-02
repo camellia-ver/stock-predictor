@@ -30,5 +30,6 @@ public class ValuationMetric {
     private BigDecimal roe;
     private BigDecimal eps;
     private BigDecimal bps;
+    private BigDecimal dps;
     private BigDecimal dividendYield;
 }
