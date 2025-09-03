@@ -1,8 +1,10 @@
 package com.example.stock_predictor.controller;
 
+import com.example.stock_predictor.model.Memo;
 import com.example.stock_predictor.model.Stock;
 import com.example.stock_predictor.model.User;
 import com.example.stock_predictor.model.ValuationMetric;
+import com.example.stock_predictor.service.MemoService;
 import com.example.stock_predictor.service.StockService;
 import com.example.stock_predictor.service.UserService;
 import com.example.stock_predictor.service.ValuationMetricService;
@@ -14,12 +16,16 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 public class StockDetailController {
     private final StockService stockService;
     private final UserService userService;
     private final ValuationMetricService valuationMetricService;
+    private final MemoService memoService;
 
     @GetMapping("/stock-detail")
     public String stockDetail(@RequestParam String ticker, Model model,
@@ -32,14 +38,18 @@ public class StockDetailController {
         model.addAttribute("valuationMetric",latestMetric);
 
         boolean isFavorite = false;
+        List<Memo> memoList = new ArrayList<>();
 
         if (userDetails != null){
             User user = userService.findByEmail(userDetails.getUsername());
             isFavorite = user.getFavorites().stream()
                     .anyMatch(fav -> fav.getStock().getTicker().equals(ticker));
+
+            memoList = memoService.getUserMemosByStock(stock.getId(), user.getId());
         }
 
         model.addAttribute("isFavorite",isFavorite);
+        model.addAttribute("memos",memoList);
 
         return "stock-detail";
     }

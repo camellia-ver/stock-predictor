@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface MemoRepository extends JpaRepository<Memo, Long> {
-    List<Memo> findByUserIdAndStockId(Long userId, Long stockId);
+    List<Memo> findByStockIdAndUserIdOrderByCreatedAtDesc(Long stockId, Long userId);
 }

@@ -10,6 +10,8 @@ import com.example.stock_predictor.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class MemoService {
@@ -32,5 +34,9 @@ public class MemoService {
                 .build();
 
         return memoRepository.save(memo);
+    }
+
+    public List<Memo> getUserMemosByStock(Long stockId, Long userId){
+        return memoRepository.findByStockIdAndUserIdOrderByCreatedAtDesc(stockId, userId);
     }
 }
