@@ -9,6 +9,9 @@ import com.example.stock_predictor.service.StockService;
 import com.example.stock_predictor.service.UserService;
 import com.example.stock_predictor.service.ValuationMetricService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -28,7 +31,9 @@ public class StockDetailController {
     private final MemoService memoService;
 
     @GetMapping("/stock-detail")
-    public String stockDetail(@RequestParam String ticker, Model model,
+    public String stockDetail(@RequestParam String ticker,
+                              @RequestParam(defaultValue = "0") int page,
+                              Model model,
                               @AuthenticationPrincipal UserDetails userDetails
                               ){
         Stock stock = stockService.getStockByTicker(ticker);
@@ -38,18 +43,19 @@ public class StockDetailController {
         model.addAttribute("valuationMetric",latestMetric);
 
         boolean isFavorite = false;
-        List<Memo> memoList = new ArrayList<>();
+        Page<Memo> memoPage = Page.empty();
 
         if (userDetails != null){
             User user = userService.findByEmail(userDetails.getUsername());
             isFavorite = user.getFavorites().stream()
                     .anyMatch(fav -> fav.getStock().getTicker().equals(ticker));
 
-            memoList = memoService.getUserMemosByStock(stock.getId(), user.getId());
+            Pageable pageable = PageRequest.of(page, 6);
+            memoPage = memoService.getUserMemosByStock(stock.getId(), user.getId() ,pageable);
         }
 
         model.addAttribute("isFavorite",isFavorite);
-        model.addAttribute("memos",memoList);
+        model.addAttribute("memoPage",memoPage);
 
         return "stock-detail";
     }

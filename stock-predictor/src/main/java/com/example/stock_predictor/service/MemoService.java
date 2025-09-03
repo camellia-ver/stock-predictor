@@ -8,6 +8,8 @@ import com.example.stock_predictor.repository.MemoRepository;
 import com.example.stock_predictor.repository.StockRepository;
 import com.example.stock_predictor.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -36,7 +38,7 @@ public class MemoService {
         return memoRepository.save(memo);
     }
 
-    public List<Memo> getUserMemosByStock(Long stockId, Long userId){
-        return memoRepository.findByStockIdAndUserIdOrderByCreatedAtDesc(stockId, userId);
+    public Page<Memo> getUserMemosByStock(Long stockId, Long userId, Pageable pageable){
+        return memoRepository.findByStockIdAndUserIdOrderByCreatedAtDesc(stockId, userId ,pageable);
     }
 }
