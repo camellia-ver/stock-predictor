@@ -20,7 +20,7 @@ def get_korea_stock(max_retries=3, delay=5):
             kospi_tickers = stock.get_market_ticker_list(market="KOSPI")
             kosdaq_tickers = stock.get_market_ticker_list(market="KOSDAQ")
             all_tickers = kospi_tickers + kosdaq_tickers
-
+            
             for ticker in all_tickers:
                 name = stock.get_market_ticker_name(ticker)
                 market_type = "KOSPI" if ticker in kospi_tickers else "KOSDAQ"
@@ -34,7 +34,6 @@ def get_korea_stock(max_retries=3, delay=5):
             print(f"[{attempt}/{max_retries}] 오류 발생: {e}. {delay}초 후 재시도...")
             time.sleep(delay)
 
-    # 모든 재시도 실패 시 빈 DataFrame 반환
     print("모든 재시도 실패. 빈 DataFrame 반환")
     return pd.DataFrame(columns=['ticker','name','market','sector','date'])
 

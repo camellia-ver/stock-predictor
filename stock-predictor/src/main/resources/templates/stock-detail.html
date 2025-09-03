@@ -85,10 +85,13 @@
     <section class="mb-4">
         <h4 class="mb-3">💹 가치평가 지표</h4>
         <div class="indicator-card d-flex flex-wrap gap-3">
-            <span>PER: 12.3</span>
-            <span>PBR: 1.1</span>
-            <span>ROE: 15%</span>
-            <span>EV/EBITDA: 8.5</span>
+            <span>PER: <span th:text="${valuationMetric.per}">12.3</span></span>
+            <span>PBR: <span th:text="${valuationMetric.pbr}">1.1</span></span>
+            <span>ROE: <span th:text="${valuationMetric.roe}">15%</span></span>
+            <span>EPS: <span th:text="${valuationMetric.eps}">3,500</span></span>
+            <span>BPS: <span th:text="${valuationMetric.bps}">25,000</span></span>
+            <span>DPS: <span th:text="${valuationMetric.dps}">500</span></span>
+            <span>Dividend Yield: <span th:text="${valuationMetric.dividendYield}">2%</span></span>
         </div>
     </section>
 

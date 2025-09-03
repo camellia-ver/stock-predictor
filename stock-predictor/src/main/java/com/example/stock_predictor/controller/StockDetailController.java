@@ -2,8 +2,10 @@ package com.example.stock_predictor.controller;
 
 import com.example.stock_predictor.model.Stock;
 import com.example.stock_predictor.model.User;
+import com.example.stock_predictor.model.ValuationMetric;
 import com.example.stock_predictor.service.StockService;
 import com.example.stock_predictor.service.UserService;
+import com.example.stock_predictor.service.ValuationMetricService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class StockDetailController {
     private final StockService stockService;
     private final UserService userService;
+    private final ValuationMetricService valuationMetricService;
 
     @GetMapping("/stock-detail")
     public String stockDetail(@RequestParam String ticker, Model model,
@@ -24,6 +27,9 @@ public class StockDetailController {
                               ){
         Stock stock = stockService.getStockByTicker(ticker);
         model.addAttribute("stock",stock);
+
+        ValuationMetric latestMetric = valuationMetricService.getLatestByStock(stock);
+        model.addAttribute("valuationMetric",latestMetric);
 
         boolean isFavorite = false;
 
