@@ -210,4 +210,38 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    document.querySelector(".btn-primary").addEventListener("click", () => {
+        const content = document.querySelector("textarea").value.trim();
+        if (!content) {
+            alert("메모 내용을 입력하세요.");
+            return;
+        }
+
+        const ticker = document.getElementById("chartSection").dataset.ticker;
+        const stockDate = new Date().toISOString();
+
+        // 메타 태그에서 CSRF 정보 가져오기
+        const tokenMeta = document.querySelector('meta[name="_csrf"]');
+        const headerMeta = document.querySelector('meta[name="_csrf_header"]');
+        const csrfToken = tokenMeta ? tokenMeta.content : null;
+        const csrfHeader = headerMeta ? headerMeta.content : null;
+
+        fetch("/api/memos", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                ...(csrfHeader && csrfToken ? { [csrfHeader]: csrfToken } : {})
+            },
+            body: JSON.stringify({ ticker, content, stockDate })
+        })
+        .then(response => {
+            if (!response.ok) throw new Error("메모 저장 실패");
+            return response.json();
+        })
+        .then(data => {
+            alert("메모가 저장되었습니다!");
+            document.querySelector("textarea").value = "";
+        })
+        .catch(err => console.error(err));
+    });
 });

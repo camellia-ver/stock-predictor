@@ -30,4 +30,15 @@ public class Memo {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime stockDate;
+
+    @PrePersist
+    public void prePersist(){
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate(){
+        this.updatedAt = LocalDateTime.now();
+    }
 }
