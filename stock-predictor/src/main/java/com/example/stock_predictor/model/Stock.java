@@ -5,6 +5,8 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "stocks")
@@ -30,4 +32,7 @@ public class Stock {
     private String sector;
 
     private LocalDate date;
+
+    @OneToMany(mappedBy = "stock", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<ValuationMetric> valuationMetrics = new ArrayList<>();
 }
