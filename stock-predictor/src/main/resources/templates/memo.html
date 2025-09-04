@@ -17,6 +17,9 @@
     <script src="/js/nav.js"></script>
     <script src="/js/memo.js"></script>
     <script src="/js/memo-modal.js"></script>
+
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 </head>
 <body class="bg-dark text-white">
 
@@ -50,7 +53,7 @@
         </div>
     </div>
 
-    <!-- 메모 카드 목록 (Thymeleaf 반복) -->
+    <!-- 메모 카드 목록 -->
     <div class="row g-4" id="memoContainer">
         <div class="col-md-6 col-lg-4" th:each="memo : ${memoList}">
             <div class="card shadow-sm h-100 bg-dark text-white border-light memo-card">
@@ -59,8 +62,9 @@
                     <h6 class="card-subtitle mb-2 text-muted"
                         th:text="${#temporals.format(memo.createdAt, 'yyyy-MM-dd')}">2025-08-17</h6>
                     <p class="card-text" th:text="${memo.content}">메모 내용 미리보기...</p>
+                    <!-- 안전하게 data-memo-id 설정 -->
                     <button type="button" class="btn btn-sm btn-outline-primary"
-                            th:attr="data-memo-id=${memo.id}">자세히 보기</button>
+                            th:data-memo-id="${memo.id}">자세히 보기</button>
                 </div>
             </div>
         </div>

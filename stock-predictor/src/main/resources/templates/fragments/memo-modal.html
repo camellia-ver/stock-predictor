@@ -1,7 +1,7 @@
 <div th:fragment="memoModal">
     <div class="modal fade" id="memoModal" tabindex="-1" aria-labelledby="memoModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content modal-themed"> <!-- 테마 클래스 -->
+            <div class="modal-content modal-themed">
 
                 <!-- 모달 헤더 -->
                 <div class="modal-header">
@@ -14,10 +14,25 @@
                     <h6 id="memoTitle" class="fw-bold mb-2"></h6>
                     <p id="memoContent"></p>
                     <small id="memoDate"></small>
+
+                    <!-- 수정용 입력 폼 (기본 숨김) -->
+                    <div id="editForm" class="d-none mt-3">
+                        <input type="text" id="editTitle" class="form-control mb-2" placeholder="제목">
+                        <textarea id="editContent" class="form-control mb-2" rows="4" placeholder="내용"></textarea>
+                        <button type="button" class="btn btn-success btn-sm" id="saveEditBtn">저장</button>
+                        <button type="button" class="btn btn-secondary btn-sm" id="cancelEditBtn">취소</button>
+                    </div>
                 </div>
 
                 <!-- 모달 푸터 -->
-                <div class="modal-footer">
+                <div class="modal-footer d-flex justify-content-between">
+                    <!-- 왼쪽: 수정/삭제 버튼 -->
+                    <div>
+                        <button type="button" class="btn btn-primary btn-sm me-2" id="editBtn">수정</button>
+                        <button type="button" class="btn btn-danger btn-sm" id="deleteBtn">삭제</button>
+                    </div>
+
+                    <!-- 오른쪽: 닫기 버튼 -->
                     <button type="button" class="btn btn-gradient btn-sm" data-bs-dismiss="modal">닫기</button>
                 </div>
 

@@ -42,4 +42,16 @@ public class MemoApiController {
                         memo.getStockDate())))
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<MemoDTO> updateMemo(@PathVariable Long id, @RequestBody MemoDTO dto){
+        Memo updated = memoService.updateMemo(id, dto);
+        return ResponseEntity.ok(new MemoDTO(updated.getStock().getTicker(),updated.getTitle(), updated.getContent(), updated.getStockDate()));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteMemo(@PathVariable Long id){
+        memoService.deleteMemo(id);
+        return ResponseEntity.noContent().build();
+    }
 }

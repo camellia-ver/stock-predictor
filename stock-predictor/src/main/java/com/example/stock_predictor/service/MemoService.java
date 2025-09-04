@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,5 +56,27 @@ public class MemoService {
 
     public Optional<Memo> getMemoById(Long id){
         return memoRepository.findById(id);
+    }
+
+    public Memo updateMemo(Long id, MemoDTO dto){
+        Memo memo = memoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("메모 없음"));
+
+        Memo updateMemo = Memo.builder()
+                .id(memo.getId())
+                .title(dto.getTitle())
+                .content(dto.getContent())
+                .createdAt(memo.getCreatedAt())
+                .updatedAt(LocalDateTime.now())
+                .stockDate(memo.getStockDate())
+                .stock(memo.getStock())
+                .user(memo.getUser())
+                .build();
+
+        return memoRepository.save(updateMemo);
+    }
+
+    public void deleteMemo(Long id){
+        memoRepository.deleteById(id);
     }
 }
