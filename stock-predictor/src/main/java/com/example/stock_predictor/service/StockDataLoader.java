@@ -9,12 +9,10 @@ import com.example.stock_predictor.repository.StockPriceRepository;
 import com.example.stock_predictor.repository.StockRepository;
 import com.example.stock_predictor.repository.ValuationMetricRepository;
 import jakarta.persistence.EntityManager;
-import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
@@ -30,6 +28,7 @@ import java.util.stream.Stream;
 @Service
 @RequiredArgsConstructor
 public class StockDataLoader {
+
     private static final int BATCH_SIZE = 1000;
 
     private final StockRepository stockRepository;
@@ -39,148 +38,116 @@ public class StockDataLoader {
     private final EntityManager em;
 
     public List<Stock> loadStockListCsv(String filePath) throws IOException {
-        if (!checkFileExistsOrSkip(filePath)) {
-            return null; // 파일 없으면 바로 종료
-        }
+        if (!checkFileExistsOrSkip(filePath)) return null;
 
-        List<Stock> readStockList = new ArrayList<>();
-        List<String> lines = Files.readAllLines(Paths.get(filePath));
-        lines.remove(0);
+        List<Stock> stockList = new ArrayList<>();
+        try (Stream<String> lines = Files.lines(Paths.get(filePath))) {
+            final Iterator<String> it = lines.skip(1).iterator(); // 헤더 스킵
+            int count = 0;
+            while (it.hasNext()) {
+                String[] cols = it.next().split(",", -1);
+                if (cols.length < 5) continue;
+                LocalDate date;
+                try { date = LocalDate.parse(cols[4]); } catch (DateTimeParseException e) { continue; }
 
-        for (String line : lines) {
-            String[] cols = line.split(",");
-            if (cols.length < 5) continue;
+                stockList.add(Stock.builder()
+                        .ticker(cols[0])
+                        .name(cols[1])
+                        .market(cols[2])
+                        .sector(cols[3])
+                        .date(date)
+                        .build());
 
-            String ticker = cols[0];
-            String name = cols[1];
-            String market = cols[2];
-            String sector = cols[3];
-            LocalDate date;
-            try {
-                date = LocalDate.parse(cols[4]);
-            } catch (DateTimeParseException e) {
-                continue;
+                count++;
+                if (count % 1000 == 0) System.out.println("StockList 처리: " + count + "줄");
             }
-
-            Stock stock = Stock.builder()
-                    .ticker(ticker)
-                    .name(name)
-                    .market(market)
-                    .sector(sector)
-                    .date(date)
-                    .build();
-
-            readStockList.add(stock);
         }
-
-        return readStockList;
+        return stockList;
     }
 
     @Transactional
-    public void loadStockIndexPriceCsv(String filePath) throws IOException{
+    public void loadStockIndexPriceCsv(String filePath) throws IOException {
         if (!checkFileExistsOrSkip(filePath)) return;
 
         List<StockIndexPrice> buffer = new ArrayList<>(BATCH_SIZE);
+        int count = 0;
 
-        try (Stream<String> lines = Files.lines(Paths.get(filePath))){
+        try (Stream<String> lines = Files.lines(Paths.get(filePath))) {
             final Iterator<String> it = lines.skip(1).iterator();
-
-            while (it.hasNext()){
-                String line = it.next();
-                String[] cols = line.split(",", -1);
+            while (it.hasNext()) {
+                String[] cols = it.next().split(",", -1);
                 if (cols.length < 9) continue;
-
-                String indexName = cols[7];
                 LocalDate date;
-                try { date = LocalDate.parse(cols[8]); }
-                catch (DateTimeParseException e) { continue; }
-
-                BigDecimal openPrice = parseBigDecimal(cols[0]);
-                BigDecimal highPrice = parseBigDecimal(cols[1]);
-                BigDecimal lowPrice = parseBigDecimal(cols[2]);
-                BigDecimal closePrice = parseBigDecimal(cols[3]);
-                Long volume = parseLong(cols[4]);
-                Long value = parseLong(cols[5]);
-                Long marketCap = parseLong(cols[5]);
+                try { date = LocalDate.parse(cols[8]); } catch (DateTimeParseException e) { continue; }
 
                 buffer.add(StockIndexPrice.builder()
-                        .indexName(indexName)
+                        .indexName(cols[7])
                         .date(date)
-                        .openPrice(openPrice)
-                        .highPrice(highPrice)
-                        .lowPrice(lowPrice)
-                        .closePrice(closePrice)
-                        .volume(volume)
-                        .value(value)
-                        .marketCap(marketCap)
+                        .openPrice(parseBigDecimal(cols[0]))
+                        .highPrice(parseBigDecimal(cols[1]))
+                        .lowPrice(parseBigDecimal(cols[2]))
+                        .closePrice(parseBigDecimal(cols[3]))
+                        .volume(parseLong(cols[4]))
+                        .value(parseLong(cols[5]))
+                        .marketCap(parseLong(cols[5]))
                         .build());
 
+                count++;
                 if (buffer.size() >= BATCH_SIZE) {
                     stockIndexPriceRepository.saveAll(buffer);
                     em.flush();
                     em.clear();
                     buffer.clear();
+                    System.out.println("StockIndexPrice 처리: " + count + "줄");
                 }
             }
         }
-
-        if (!buffer.isEmpty()){
+        if (!buffer.isEmpty()) {
             stockIndexPriceRepository.saveAll(buffer);
             em.flush();
             em.clear();
+            System.out.println("StockIndexPrice 최종 처리: " + count + "줄");
         }
     }
 
     @Transactional
     public void loadStockPriceCsv(String filePath) throws IOException {
-        if (!checkFileExistsOrSkip(filePath)) {
-            return; // 파일 없으면 바로 종료
-        }
+        if (!checkFileExistsOrSkip(filePath)) return;
 
-        // 1) 필요한 티커만 캐시
         Map<String, Stock> stockCache = loadStockCache(filePath);
-
         List<StockPrice> buffer = new ArrayList<>(BATCH_SIZE);
+        int count = 0;
+
         try (Stream<String> lines = Files.lines(Paths.get(filePath))) {
-            final Iterator<String> it = lines.skip(1).iterator(); // 헤더 스킵
+            final Iterator<String> it = lines.skip(1).iterator();
             while (it.hasNext()) {
-                String line = it.next();
-                String[] cols = line.split(",", -1);
+                String[] cols = it.next().split(",", -1);
                 if (cols.length < 8) continue;
 
-                // 파싱
                 LocalDate date;
-                try {
-                    date = LocalDate.parse(cols[0]); // yyyy-MM-dd 가정
-                } catch (DateTimeParseException e) { continue; }
+                try { date = LocalDate.parse(cols[0]); } catch (DateTimeParseException e) { continue; }
 
-                String ticker = cols[7];
-                Stock stock = stockCache.get(ticker);
+                Stock stock = stockCache.get(cols[7]);
                 if (stock == null) continue;
-
-                BigDecimal open  = parseBigDecimal(cols[1]);
-                BigDecimal close = parseBigDecimal(cols[2]);
-                BigDecimal high  = parseBigDecimal(cols[3]);
-                BigDecimal low   = parseBigDecimal(cols[4]);
-                Long volume      = parseLong(cols[5]);
-                BigDecimal chgRt = parseBigDecimal(cols[6]);
 
                 buffer.add(StockPrice.builder()
                         .stock(stock)
                         .date(date)
-                        .openPrice(open)
-                        .closePrice(close)
-                        .highPrice(high)
-                        .lowPrice(low)
-                        .volume(volume)
-                        .changeRate(chgRt)
+                        .openPrice(parseBigDecimal(cols[1]))
+                        .closePrice(parseBigDecimal(cols[2]))
+                        .highPrice(parseBigDecimal(cols[3]))
+                        .lowPrice(parseBigDecimal(cols[4]))
+                        .volume(parseLong(cols[5]))
+                        .changeRate(parseBigDecimal(cols[6]))
                         .build());
 
+                count++;
                 if (buffer.size() >= BATCH_SIZE) {
                     stockPriceRepository.saveAll(buffer);
-                    em.flush();   // DB로 밀어넣기
-                    em.clear();   // 1차 캐시 비움 (메모리 사용량 안정화)
+                    em.flush();
+                    em.clear();
                     buffer.clear();
+                    System.out.println("StockPrice 처리: " + count + "줄");
                 }
             }
         }
@@ -188,86 +155,88 @@ public class StockDataLoader {
             stockPriceRepository.saveAll(buffer);
             em.flush();
             em.clear();
+            System.out.println("StockPrice 최종 처리: " + count + "줄");
         }
     }
 
     private Map<String, Stock> loadStockCache(String filePath) throws IOException {
         Set<String> tickers = new HashSet<>();
+
         try (Stream<String> lines = Files.lines(Paths.get(filePath))) {
             lines.skip(1).forEach(line -> {
                 String[] cols = line.split(",", -1);
                 if (cols.length >= 8) tickers.add(cols[7]);
             });
         }
-        return stockRepository.findByTickerIn(tickers).stream()
-                .collect(Collectors.toMap(Stock::getTicker, Function.identity()));
+
+        Map<String ,Stock> stockMap = new HashMap<>();
+        List<String> tickerList = new ArrayList<>(tickers);
+
+        final int checkSize = 1000;
+        for (int i = 0; i < tickerList.size(); i += checkSize){
+            int end = Math.min(i + checkSize, tickerList.size());
+            List<String> chunk = tickerList.subList(i ,end);
+            stockRepository.findByTickerIn(chunk)
+                    .forEach(stock -> stockMap.put(stock.getTicker(), stock));
+        }
+
+        return stockMap;
     }
 
     @Transactional
-    public void loadValuationMetricCsv(String filePath) throws IOException{
-        if (!checkFileExistsOrSkip(filePath)){
-            return;
-        }
+    public void loadValuationMetricCsv(String filePath) throws IOException {
+        if (!checkFileExistsOrSkip(filePath)) return;
 
         Map<String, Stock> stockCache = loadStockCache(filePath);
-
         List<ValuationMetric> buffer = new ArrayList<>(BATCH_SIZE);
-        try (Stream<String> lines = Files.lines(Paths.get(filePath))){
+        int count = 0;
+
+        try (Stream<String> lines = Files.lines(Paths.get(filePath))) {
             final Iterator<String> it = lines.skip(1).iterator();
-            while(it.hasNext()){
-                String line = it.next();
-                String[] cols = line.split(",",-1);
+            while (it.hasNext()) {
+                String[] cols = it.next().split(",", -1);
                 if (cols.length < 9) continue;
 
                 LocalDate date;
-                try{
-                    date = LocalDate.parse(cols[0]);
-                }catch (DateTimeParseException e){continue;}
+                try { date = LocalDate.parse(cols[0]); } catch (DateTimeParseException e) { continue; }
 
-                String ticker = cols[7];
-                Stock stock = stockCache.get(ticker);
+                Stock stock = stockCache.get(cols[7]);
                 if (stock == null) continue;
-
-                BigDecimal roe = parseBigDecimal(cols[8]);
-                BigDecimal per = parseBigDecimal(cols[2]);
-                BigDecimal pbr = parseBigDecimal(cols[3]);
-                BigDecimal eps = parseBigDecimal(cols[4]);
-                BigDecimal bps = parseBigDecimal(cols[1]);
-                BigDecimal dps = parseBigDecimal(cols[6]);
-                BigDecimal dividendYield = parseBigDecimal(cols[5]);
 
                 buffer.add(ValuationMetric.builder()
                         .stock(stock)
                         .date(date)
-                        .roe(roe)
-                        .per(per)
-                        .pbr(pbr)
-                        .eps(eps)
-                        .bps(bps)
-                        .dps(dps)
-                        .dividendYield(dividendYield)
+                        .roe(parseBigDecimal(cols[8]))
+                        .per(parseBigDecimal(cols[2]))
+                        .pbr(parseBigDecimal(cols[3]))
+                        .eps(parseBigDecimal(cols[4]))
+                        .bps(parseBigDecimal(cols[1]))
+                        .dps(parseBigDecimal(cols[6]))
+                        .dividendYield(parseBigDecimal(cols[5]))
                         .build());
 
-                if (buffer.size() >= BATCH_SIZE){
+                count++;
+                if (buffer.size() >= BATCH_SIZE) {
                     valuationMetricRepository.saveAll(buffer);
                     em.flush();
                     em.clear();
                     buffer.clear();
+                    System.out.println("ValuationMetric 처리: " + count + "줄");
                 }
             }
         }
-
-        if (!buffer.isEmpty()){
+        if (!buffer.isEmpty()) {
             valuationMetricRepository.saveAll(buffer);
             em.flush();
             em.clear();
+            System.out.println("ValuationMetric 최종 처리: " + count + "줄");
         }
     }
 
-    private boolean checkFileExistsOrSkip(String filePath){
+    private boolean checkFileExistsOrSkip(String filePath) {
         Path path = Paths.get(filePath);
-        if (!Files.exists(path)){
-            System.out.println("CSV 파일이 존재하지 않아 스킵합니다: "+ filePath);
+        if (!Files.exists(path)) {
+            System.out.println("CSV 파일이 존재하지 않아 스킵합니다: " + filePath);
             return false;
         }
         return true;
@@ -275,17 +244,16 @@ public class StockDataLoader {
 
     private BigDecimal parseBigDecimal(String s) {
         if (s == null || s.isEmpty()) return BigDecimal.ZERO;
-        s = s.trim();
-        try {
-            return new BigDecimal(s);
-        } catch (NumberFormatException e) {
+        try { return new BigDecimal(s.trim()); }
+        catch (NumberFormatException e) {
             System.err.println("숫자로 변환 불가: " + s);
             return null;
         }
     }
 
-    private Long parseLong(String value) {
-        return (value == null || value.isEmpty()) ? 0L : Long.parseLong(value);
+    private Long parseLong(String s) {
+        if (s == null || s.isEmpty()) return 0L;
+        try { return Long.parseLong(s.trim()); }
+        catch (NumberFormatException e) { return 0L; }
     }
-
 }
