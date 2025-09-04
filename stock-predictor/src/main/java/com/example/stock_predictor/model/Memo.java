@@ -24,6 +24,9 @@ public class Memo {
     @JoinColumn(name = "stock_id", nullable = false)
     private Stock stock;
 
+    @Column(nullable = false, length = 100)
+    private String title;
+
     @Column(columnDefinition = "TEXT")
     private String content;
 

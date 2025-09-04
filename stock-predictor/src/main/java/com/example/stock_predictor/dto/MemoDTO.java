@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class MemoDTO {
     private String ticker;
+    private String title;
     private String content;
     private LocalDateTime stockDate;
 }

@@ -24,6 +24,7 @@ public class MemoApiController {
         Memo savedMemo = memoService.createMemo(userDetails.getUsername(), dto);
         MemoDTO response = new MemoDTO(
                 savedMemo.getStock().getTicker(),
+                savedMemo.getTitle(),
                 savedMemo.getContent(),
                 savedMemo.getStockDate()
         );

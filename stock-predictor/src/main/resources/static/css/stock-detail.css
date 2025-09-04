@@ -12,7 +12,7 @@
 
 /* canvas 높이 */
 #priceChart {
-    height: 100% !important; /* 부모 높이를 100%로 채움 */
+    height: 100% !important;
     width: 100% !important;
 }
 
@@ -35,24 +35,35 @@
     color: #ffffff;
 }
 
-/* ----------------- 메모 박스 ----------------- */
+/* ----------------- 메모 입력 필드 (제목 + 내용 공통 스타일) ----------------- */
+.memo-box input[type="text"],
 .memo-box textarea {
     width: 100%;
-    resize: vertical;
-    min-height: 100px;
     background-color: rgba(0,0,0,0.6);
     border: 1px solid rgba(255,255,255,0.6);
     border-radius: 8px;
-    color: #f5f5f5;
+    color: #f5f5f5;                 /* 입력 글씨 */
     padding: 0.75rem;
+    font-size: 0.95rem;
     transition: all 0.3s ease;
+    resize: vertical;
+    min-height: 40px;               /* input과 textarea 높이 균형 */
 }
 
+/* placeholder 색상 */
+.memo-box input[type="text"]::placeholder,
+.memo-box textarea::placeholder {
+    color: rgba(245,245,245,0.6);
+}
+
+/* focus 효과 */
+.memo-box input[type="text"]:focus,
 .memo-box textarea:focus {
     outline: none;
     border-color: #ffd700;
     background-color: rgba(0,0,0,0.7);
     box-shadow: 0 0 10px rgba(255,215,0,0.6);
+    color: #f5f5f5;
 }
 
 /* ----------------- 탭 글자 대비 향상 ----------------- */
@@ -60,13 +71,11 @@
     color: rgba(255,255,255,0.85);
     transition: all 0.2s ease;
 }
-
 .nav-tabs .nav-link:hover {
     color: #ffffff;
     background-color: rgba(0,0,0,0.25);
     border-radius: 0.5rem 0.5rem 0 0;
 }
-
 .nav-tabs .nav-link.active {
     color: #ffffff;
     font-weight: 700;
@@ -78,27 +87,24 @@
     font-weight: 600;
     border-width: 2px;
     transition: all 0.3s ease;
-    color: #ffd700; /* 기본 글자색: 금색 별 */
+    color: #ffd700;
     background-color: rgba(0,0,0,0.3);
 }
-
 .favorite-btn:hover {
     color: #ffffff;
     background-color: rgba(255, 215, 0, 0.2);
     transform: translateY(-2px) scale(1.05);
     box-shadow: 0 4px 12px rgba(0,0,0,0.25);
 }
-
-/* 즐겨찾기 활성 상태 */
 .favorite-btn.active {
     color: #ffffff;
-    background-color: #ffd700; /* 배경 금색 강조 */
+    background-color: #ffd700;
     box-shadow: 0 4px 12px rgba(255,215,0,0.5);
 }
 
 /* ----------------- 메모 저장 버튼 ----------------- */
 .memo-box .btn {
-    background-color: #4da8ff; /* 밝은 하늘색으로 변경 */
+    background-color: #4da8ff;
     color: #ffffff;
     font-weight: 600;
     padding: 0.5rem 1rem;
@@ -107,7 +113,6 @@
     transition: all 0.3s ease;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
-
 .memo-box .btn:hover {
     background: linear-gradient(135deg, #0d6efd, #6610f2);
     color: #ffffff;
@@ -118,7 +123,7 @@
 /* ----------------- 전체보기 버튼 ----------------- */
 .news-item + .text-end .btn-outline-primary {
     color: #ffffff;
-    background-color: #4da8ff; /* 밝은 하늘색으로 변경 */
+    background-color: #4da8ff;
     border: none;
     font-weight: 600;
     padding: 0.4rem 0.9rem;
@@ -126,7 +131,6 @@
     transition: all 0.3s ease;
     box-shadow: 0 3px 10px rgba(0,0,0,0.25);
 }
-
 .news-item + .text-end .btn-outline-primary:hover {
     background: linear-gradient(135deg, #0d6efd, #6610f2);
     color: #ffffff;
@@ -134,10 +138,9 @@
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
 }
 
-
 /* ----------------- 메모 카드 자세히 보기 버튼 ----------------- */
 .card.memo-card .btn-outline-primary {
-    color: #4da8ff; /* 밝은 하늘색 */
+    color: #4da8ff;
     background-color: transparent;
     border: 2px solid #4da8ff;
     font-weight: 600;
@@ -146,7 +149,6 @@
     transition: all 0.3s ease;
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
-
 .card.memo-card .btn-outline-primary:hover {
     background: linear-gradient(135deg, #0d6efd, #6610f2);
     color: #ffffff;
@@ -155,33 +157,27 @@
     box-shadow: 0 6px 16px rgba(0,0,0,0.35);
 }
 
-/* 도움말 카드 */
+/* ----------------- 도움말 카드 ----------------- */
 #helpCard {
-  display: none;              /* 기본 숨김 */
-  background: linear-gradient(135deg, #1E3A8A, #3B82F6); /* 파란색 그라데이션 */
-  color: #ffffff;             /* 글자 하얀색 */
-  border-radius: 12px;        /* 둥근 모서리 */
-  padding: 16px;              /* 안쪽 여백 */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25); /* 그림자 */
-  font-size: 0.9rem;          /* 약간 작은 폰트 */
-  line-height: 1.5;           /* 줄 간격 */
+  display: none;
+  background: linear-gradient(135deg, #1E3A8A, #3B82F6);
+  color: #ffffff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  font-size: 0.9rem;
+  line-height: 1.5;
 }
-
-/* 목록 스타일 */
 #helpCard ul {
   padding-left: 1.2em;
   margin: 8px 0 0 0;
-  list-style-type: disc;       /* 점 목록 */
+  list-style-type: disc;
 }
-
-/* 목록 아이템 강조 */
 #helpCard ul li {
   margin-bottom: 6px;
 }
-
-/* 버튼 스타일 */
 #helpBtn {
-  background-color: #2563EB;  /* 진한 파란색 */
+  background-color: #2563EB;
   color: #ffffff;
   border: none;
   border-radius: 6px;
@@ -190,12 +186,11 @@
   cursor: pointer;
   transition: background 0.3s;
 }
-
-/* 버튼 호버 */
 #helpBtn:hover {
   background-color: #1D4ED8;
 }
 
+/* ----------------- 상세 패널 ----------------- */
 #detailPanel {
   white-space: pre-wrap;
   color: black;

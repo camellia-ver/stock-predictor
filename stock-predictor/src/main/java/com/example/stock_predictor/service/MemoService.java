@@ -28,9 +28,15 @@ public class MemoService {
         Stock stock = stockRepository.findByTicker(dto.getTicker())
                 .orElseThrow(() -> new RuntimeException("Stock not found"));
 
+        // 제목이 없으면 내용 앞 20자를 자동으로 제목으로 설정
+        String finalTitle = (dto.getTitle() == null || dto.getTitle().trim().isEmpty())
+                ? (dto.getContent().length() > 20 ? dto.getContent().substring(0, 20) + "..." : dto.getContent())
+                : dto.getTitle();
+
         Memo memo = Memo.builder()
                 .user(user)
                 .stock(stock)
+                .title(finalTitle)
                 .content(dto.getContent())
                 .stockDate(dto.getStockDate())
                 .build();

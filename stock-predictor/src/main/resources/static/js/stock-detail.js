@@ -89,12 +89,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if(chart) chart.destroy();
 
-        // y축 범위 자동 계산
         const ohlcValues = candles.flatMap(c => [c.o, c.h, c.l, c.c]);
         const minPrice = Math.min(...ohlcValues);
         const maxPrice = Math.max(...ohlcValues);
 
-        // 볼륨 범위 자동 계산
         const volumes = candles.map(c => c.v ?? 0);
         const maxVolume = Math.max(...volumes);
 
@@ -197,7 +195,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const resetZoomBtn = document.getElementById("resetZoomBtn");
     if(resetZoomBtn){
         resetZoomBtn.addEventListener("click", () => {
-            if(chart) chart.resetZoom(); // chartjs-plugin-zoom 메서드
+            if(chart) chart.resetZoom();
         });
     }
 
@@ -210,38 +208,54 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    document.querySelector(".btn-primary").addEventListener("click", () => {
-        const content = document.querySelector("textarea").value.trim();
-        if (!content) {
-            alert("메모 내용을 입력하세요.");
-            return;
-        }
+    // -------------------- 메모 저장 (AJAX) --------------------
+    const memoForm = document.querySelector(".memo-box");
+    if (memoForm) {
+        memoForm.addEventListener("submit", (e) => {
+            e.preventDefault();
 
-        const ticker = document.getElementById("chartSection").dataset.ticker;
-        const stockDate = new Date().toISOString();
+            const content = memoForm.querySelector("textarea").value.trim();
+            const title = memoForm.querySelector("input[name='title']").value.trim();
+            if (!content) {
+                alert("메모 내용을 입력하세요.");
+                return;
+            }
 
-        // 메타 태그에서 CSRF 정보 가져오기
-        const tokenMeta = document.querySelector('meta[name="_csrf"]');
-        const headerMeta = document.querySelector('meta[name="_csrf_header"]');
-        const csrfToken = tokenMeta ? tokenMeta.content : null;
-        const csrfHeader = headerMeta ? headerMeta.content : null;
+            const ticker = document.getElementById("chartSection").dataset.ticker;
+            const stockDate = new Date().toISOString();
 
-        fetch("/api/memos", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                ...(csrfHeader && csrfToken ? { [csrfHeader]: csrfToken } : {})
-            },
-            body: JSON.stringify({ ticker, content, stockDate })
-        })
-        .then(response => {
-            if (!response.ok) throw new Error("메모 저장 실패");
-            return response.json();
-        })
-        .then(data => {
-            alert("메모가 저장되었습니다!");
-            document.querySelector("textarea").value = "";
-        })
-        .catch(err => console.error(err));
+            const tokenMeta = document.querySelector('meta[name="_csrf"]');
+            const headerMeta = document.querySelector('meta[name="_csrf_header"]');
+            const csrfToken = tokenMeta ? tokenMeta.content : null;
+            const csrfHeader = headerMeta ? headerMeta.content : null;
+
+            fetch("/api/memos", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(csrfHeader && csrfToken ? { [csrfHeader]: csrfToken } : {})
+                },
+                body: JSON.stringify({ ticker, title, content, stockDate })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error("메모 저장 실패");
+                return response.json();
+            })
+            .then(data => {
+                alert("메모가 저장되었습니다!");
+                location.reload();
+            })
+            .catch(err => console.error(err));
+        });
+    }
+
+    // -------------------- textarea 자동 높이 조절 --------------------
+    const textareas = document.querySelectorAll(".memo-box textarea");
+    textareas.forEach(textarea => {
+        textarea.addEventListener("input", function () {
+            this.style.height = "auto";
+            this.style.height = this.scrollHeight + "px";
+        });
+        textarea.style.height = textarea.scrollHeight + "px";
     });
 });
