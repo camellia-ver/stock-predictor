@@ -76,47 +76,58 @@ public class StockDataLoader {
         return readStockList;
     }
 
+    @Transactional
     public void loadStockIndexPriceCsv(String filePath) throws IOException{
-        if (!checkFileExistsOrSkip(filePath)) {
-            return; // 파일 없으면 바로 종료
+        if (!checkFileExistsOrSkip(filePath)) return;
+
+        List<StockIndexPrice> buffer = new ArrayList<>(BATCH_SIZE);
+
+        try (Stream<String> lines = Files.lines(Paths.get(filePath))){
+            final Iterator<String> it = lines.skip(1).iterator();
+
+            while (it.hasNext()){
+                String line = it.next();
+                String[] cols = line.split(",", -1);
+                if (cols.length < 9) continue;
+
+                String indexName = cols[7];
+                LocalDate date;
+                try { date = LocalDate.parse(cols[8]); }
+                catch (DateTimeParseException e) { continue; }
+
+                BigDecimal openPrice = parseBigDecimal(cols[0]);
+                BigDecimal highPrice = parseBigDecimal(cols[1]);
+                BigDecimal lowPrice = parseBigDecimal(cols[2]);
+                BigDecimal closePrice = parseBigDecimal(cols[3]);
+                Long volume = parseLong(cols[4]);
+                Long value = parseLong(cols[5]);
+                Long marketCap = parseLong(cols[5]);
+
+                buffer.add(StockIndexPrice.builder()
+                        .indexName(indexName)
+                        .date(date)
+                        .openPrice(openPrice)
+                        .highPrice(highPrice)
+                        .lowPrice(lowPrice)
+                        .closePrice(closePrice)
+                        .volume(volume)
+                        .value(value)
+                        .marketCap(marketCap)
+                        .build());
+
+                if (buffer.size() >= BATCH_SIZE) {
+                    stockIndexPriceRepository.saveAll(buffer);
+                    em.flush();
+                    em.clear();
+                    buffer.clear();
+                }
+            }
         }
 
-        List<String> lines = Files.readAllLines(Paths.get(filePath));
-        lines.remove(0);
-
-        for (String line : lines) {
-            String[] cols = line.split(",");
-            if (cols.length < 9) continue;
-
-            String indexName = cols[7];
-            LocalDate date;
-            try {
-                date = LocalDate.parse(cols[8]);
-            }catch (DateTimeParseException e){
-                continue;
-            }
-
-            BigDecimal openPrice = parseBigDecimal(cols[0]);
-            BigDecimal highPrice = parseBigDecimal(cols[1]);
-            BigDecimal lowPrice = parseBigDecimal(cols[2]);
-            BigDecimal closePrice = parseBigDecimal(cols[3]);
-            Long volume = parseLong(cols[4]);
-            Long value = parseLong(cols[5]);
-            Long marketCap = parseLong(cols[5]);
-
-            StockIndexPrice stockIndexPrice = StockIndexPrice.builder()
-                    .indexName(indexName)
-                    .date(date)
-                    .openPrice(openPrice)
-                    .highPrice(highPrice)
-                    .lowPrice(lowPrice)
-                    .closePrice(closePrice)
-                    .volume(volume)
-                    .value(value)
-                    .marketCap(marketCap)
-                    .build();
-
-            stockIndexPriceRepository.save(stockIndexPrice);
+        if (!buffer.isEmpty()){
+            stockIndexPriceRepository.saveAll(buffer);
+            em.flush();
+            em.clear();
         }
     }
 

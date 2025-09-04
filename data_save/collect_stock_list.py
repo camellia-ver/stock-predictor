@@ -2,7 +2,7 @@ import pandas as pd
 from pykrx import stock
 from datetime import datetime
 import time
-import os
+from utills import save_to_csv
 
 def get_korea_stock(max_retries=3, delay=5):
     """
@@ -20,11 +20,24 @@ def get_korea_stock(max_retries=3, delay=5):
             kospi_tickers = stock.get_market_ticker_list(market="KOSPI")
             kosdaq_tickers = stock.get_market_ticker_list(market="KOSDAQ")
             all_tickers = kospi_tickers + kosdaq_tickers
+
+            kospi_set = set(kospi_tickers)
+            kosdaq_set = set(kosdaq_tickers)
+
+            today = datetime.now().strftime('%Y-%m-%d')
             
             for ticker in all_tickers:
-                name = stock.get_market_ticker_name(ticker)
-                market_type = "KOSPI" if ticker in kospi_tickers else "KOSDAQ"
-                data.append([ticker, name, market_type, None, datetime.now().strftime('%Y-%m-%d')])
+                for retry in range(3):
+                    try:
+                        name = stock.get_market_ticker_name(ticker)
+                        market_type = "KOSPI" if ticker in kospi_set else "KOSDAQ"
+                        data.append([ticker, name, market_type, 'Unknown', today])
+                        break
+                    except Exception as e:
+                        print(f"⚠️ {ticker} 조회 실패: {e}. 재시도 {retry+1}/3")
+                        time.sleep(1)
+                else:
+                    print(f"❌ {ticker} 최종 실패. 데이터 생략")
 
             df = pd.DataFrame(data, columns=['ticker','name','market','sector','date'])
             return df
@@ -37,9 +50,5 @@ def get_korea_stock(max_retries=3, delay=5):
     print("모든 재시도 실패. 빈 DataFrame 반환")
     return pd.DataFrame(columns=['ticker','name','market','sector','date'])
 
-os.makedirs("stock_price_data", exist_ok=True)
-
-file_name = f"stock_price_data/stock_list.csv"
-get_korea_stock().to_csv(file_name, index=False, encoding="utf-8-sig")  # 한글깨짐 방지
-
-print(f"CSV 파일이 저장되었습니다: {file_name}")
+df_stock = get_korea_stock()
+save_to_csv(df_stock, file_name="stock_list.csv")
