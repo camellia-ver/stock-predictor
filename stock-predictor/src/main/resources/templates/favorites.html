@@ -33,10 +33,11 @@
     <!-- 검색 및 정렬 -->
     <div class="row mb-3">
         <div class="col-md-6 mb-2">
-            <input type="text" class="form-control" placeholder="종목명 검색..." id="searchStock">
+            <input type="text" class="form-control" placeholder="종목명 검색..." id="searchStock"
+                   th:value="${param.searchStock}">
         </div>
         <div class="col-md-6 text-md-end">
-            <select class="form-select w-auto d-inline-block" id="sortOption">
+            <select class="form-select w-auto d-inline-block" id="sortOption" th:value="${param.sortOption}">
                 <option value="name">이름순</option>
                 <option value="price">가격순</option>
                 <option value="change">등락률순</option>
@@ -57,34 +58,59 @@
                 </tr>
                 </thead>
                 <tbody>
-                    <tr th:each="stock : ${favorites}"
-                        style="cursor:pointer"
-                        th:attr="data-ticker=${stock.ticker}"
-                        onclick="location.href='/stock-detail?ticker=' + this.dataset.ticker">
+                <tr th:each="stock : ${favorites}"
+                    style="cursor:pointer"
+                    th:attr="data-ticker=${stock.ticker}"
+                    onclick="location.href='/stock-detail?ticker=' + this.dataset.ticker">
 
-                        <td class="fw-bold text-primary" th:text="${stock.name}"></td>
-                        <td class="text-end" th:text="${#numbers.formatDecimal(stock.price,0,'COMMA',0,'POINT')}"></td>
-                        <td class="text-end">
+                    <td class="fw-bold text-primary" th:text="${stock.name}"></td>
+                    <td class="text-end" th:text="${#numbers.formatDecimal(stock.price,0,'COMMA',0,'POINT')}"></td>
+                    <td class="text-end">
                             <span th:if="${stock.changePercent != null and stock.changePercent > 0}"
                                   class="text-success"
                                   th:text="'▲ ' + ${#numbers.formatDecimal(stock.changePercent,1,1)} + '%'">
                             </span>
-                            <span th:if="${stock.changePercent != null and stock.changePercent < 0}"
-                                  class="text-danger"
-                                  th:text="'▼ ' + ${#numbers.formatDecimal(stock.changePercent,1,1)} + '%'">
+                        <span th:if="${stock.changePercent != null and stock.changePercent < 0}"
+                              class="text-danger"
+                              th:text="'▼ ' + ${#numbers.formatDecimal(stock.changePercent,1,1)} + '%'">
                             </span>
-                            <span th:if="${stock.changePercent == null}" th:text="'-'"></span>
-                        </td>
-                        <td class="text-center memo-btn-cell">
-                            <a th:href="@{/memo/{id}(id=${stock.ticker})}"
-                               class="btn btn-sm btn-outline-primary"
-                               onclick="event.stopPropagation()">보기</a>
-                        </td>
-                    </tr>
+                        <span th:if="${stock.changePercent == null}" th:text="'-'"></span>
+                    </td>
+                    <td class="text-center memo-btn-cell">
+                        <a th:href="@{/memo/{id}(id=${stock.ticker})}"
+                           class="btn btn-sm btn-outline-primary"
+                           onclick="event.stopPropagation()">보기</a>
+                    </td>
+                </tr>
                 </tbody>
             </table>
         </div>
     </div>
+
+    <!-- 페이지네이션 -->
+    <nav aria-label="Page navigation example" class="mt-3">
+        <ul class="pagination justify-content-center">
+            <!-- 이전 페이지 -->
+            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                <a class="page-link" th:href="@{/favorites(page=${currentPage - 1}, search=${param.searchStock}, sort=${param.sortOption})}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+
+            <!-- 페이지 번호 -->
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                th:classappend="${i == currentPage} ? 'active'">
+                <a class="page-link" th:href="@{/favorites(page=${i}, search=${param.searchStock}, sort=${param.sortOption})}" th:text="${i + 1}"></a>
+            </li>
+
+            <!-- 다음 페이지 -->
+            <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
+                <a class="page-link" th:href="@{/favorites(page=${currentPage + 1}, search=${param.searchStock}, sort=${param.sortOption})}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
 </main>
 
 <!-- FOOTER -->

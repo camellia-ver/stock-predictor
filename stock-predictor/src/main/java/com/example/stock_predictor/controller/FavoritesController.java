@@ -6,11 +6,13 @@ import com.example.stock_predictor.model.StockPrice;
 import com.example.stock_predictor.service.FavoriteService;
 import com.example.stock_predictor.service.StockPriceService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -24,9 +26,13 @@ public class FavoritesController {
     private final StockPriceService stockPriceService;
 
     @GetMapping("/favorites")
-    public String favorites(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        List<Favorite> favorites = favoriteService.getFavorites(userDetails.getUsername(),false);
-        List<StockWithPriceDTO> favoritesDTO = favorites.stream()
+    public String favorites(Model model,
+                            @AuthenticationPrincipal UserDetails userDetails,
+                            @RequestParam(defaultValue = "0") int page){
+        int pageSize = 10;
+        Page<Favorite> favoritesPage = favoriteService.getFavorites (userDetails.getUsername(),page,pageSize);
+
+        List<StockWithPriceDTO> favoritesDTO = favoritesPage.stream()
                 .map(f -> {
                     Optional<StockPrice> latestPriceOpt = stockPriceService.getLatestPrice(f.getStock());
                     BigDecimal price = null, change = null, changePercent = null;
@@ -53,6 +59,8 @@ public class FavoritesController {
                 .collect(Collectors.toList());
 
         model.addAttribute("favorites", favoritesDTO);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", favoritesPage.getTotalPages());
 
         return "favorites";
     }

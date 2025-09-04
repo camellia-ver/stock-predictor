@@ -6,6 +6,9 @@ import com.example.stock_predictor.model.User;
 import com.example.stock_predictor.repository.FavoriteRepository;
 import com.example.stock_predictor.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -16,11 +19,17 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class FavoriteService {
     private final FavoriteRepository favoriteRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
+
+    public Page<Favorite> getFavorites(String email, int page, int size){
+        User currentUser = userService.getUserByEmail(email);
+
+        Pageable pageable = PageRequest.of(page,size);
+        return favoriteRepository.findByUser(currentUser, pageable);
+    }
 
     public List<Favorite> getFavorites(String email, boolean limit){
-        User currentUser = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User currentUser = userService.getUserByEmail(email);
 
         if (limit){
             return favoriteRepository.findTop5ByUserOrderByCreatedAtDesc(currentUser);
