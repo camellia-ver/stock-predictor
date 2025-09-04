@@ -26,7 +26,8 @@ public class StockDataScheduler {
     private final StockDataLoader stockDataLoader;
     private final StockService stockService;
 
-    @Scheduled(cron = "0 55 8 ? * TUE-SAT")
+//    @Scheduled(cron = "0 55 8 ? * TUE-SAT")
+    @Scheduled(cron = "0 51 16 ? * TUE-SAT")
     public void updateDailyStockData() throws IOException {
         Formatter formatter = new Formatter();
         String formattedDate = formatter.formattingDate();
@@ -37,11 +38,14 @@ public class StockDataScheduler {
         path = Paths.get(stockPriceFilesPath, "new_korea_stock_index_price_" + formattedDate + ".csv");
         stockDataLoader.loadStockIndexPriceCsv(path.toString());
 
-        path = Paths.get(stockPriceFilesPath, "stock_list.csv");
-        List<Stock> stockList = stockDataLoader.loadStockListCsv(path.toString());
-        stockService.syncWithCsv(stockList);
-
         path = Paths.get(stockPriceFilesPath, "new_korea_valuation_" + formattedDate + ".csv");
         stockDataLoader.loadValuationMetricCsv(path.toString());
+    }
+
+    @Scheduled(cron = "0 55 8 1 * ?")
+    public void updateMonthlyStockList() throws IOException{
+        Path path = Paths.get(stockPriceFilesPath, "stock_list.csv");
+        List<Stock> stockList = stockDataLoader.loadStockListCsv(path.toString());
+        stockService.syncWithCsv(stockList);
     }
 }

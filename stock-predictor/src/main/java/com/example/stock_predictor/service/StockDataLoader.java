@@ -28,7 +28,6 @@ import java.util.stream.Stream;
 @Service
 @RequiredArgsConstructor
 public class StockDataLoader {
-
     private static final int BATCH_SIZE = 1000;
 
     private final StockRepository stockRepository;
@@ -42,13 +41,18 @@ public class StockDataLoader {
 
         List<Stock> stockList = new ArrayList<>();
         try (Stream<String> lines = Files.lines(Paths.get(filePath))) {
-            final Iterator<String> it = lines.skip(1).iterator(); // 헤더 스킵
-            int count = 0;
+            final Iterator<String> it = lines.skip(1).iterator();
             while (it.hasNext()) {
                 String[] cols = it.next().split(",", -1);
+
                 if (cols.length < 5) continue;
+
                 LocalDate date;
-                try { date = LocalDate.parse(cols[4]); } catch (DateTimeParseException e) { continue; }
+                try {
+                    date = LocalDate.parse(cols[4]);
+                } catch (DateTimeParseException e) {
+                    continue;
+                }
 
                 stockList.add(Stock.builder()
                         .ticker(cols[0])
@@ -57,9 +61,6 @@ public class StockDataLoader {
                         .sector(cols[3])
                         .date(date)
                         .build());
-
-                count++;
-                if (count % 1000 == 0) System.out.println("StockList 처리: " + count + "줄");
             }
         }
         return stockList;
@@ -70,13 +71,13 @@ public class StockDataLoader {
         if (!checkFileExistsOrSkip(filePath)) return;
 
         List<StockIndexPrice> buffer = new ArrayList<>(BATCH_SIZE);
-        int count = 0;
 
         try (Stream<String> lines = Files.lines(Paths.get(filePath))) {
             final Iterator<String> it = lines.skip(1).iterator();
             while (it.hasNext()) {
                 String[] cols = it.next().split(",", -1);
                 if (cols.length < 9) continue;
+
                 LocalDate date;
                 try { date = LocalDate.parse(cols[8]); } catch (DateTimeParseException e) { continue; }
 
@@ -92,13 +93,11 @@ public class StockDataLoader {
                         .marketCap(parseLong(cols[5]))
                         .build());
 
-                count++;
                 if (buffer.size() >= BATCH_SIZE) {
                     stockIndexPriceRepository.saveAll(buffer);
                     em.flush();
                     em.clear();
                     buffer.clear();
-                    System.out.println("StockIndexPrice 처리: " + count + "줄");
                 }
             }
         }
@@ -106,7 +105,6 @@ public class StockDataLoader {
             stockIndexPriceRepository.saveAll(buffer);
             em.flush();
             em.clear();
-            System.out.println("StockIndexPrice 최종 처리: " + count + "줄");
         }
     }
 
@@ -116,7 +114,6 @@ public class StockDataLoader {
 
         Map<String, Stock> stockCache = loadStockCache(filePath);
         List<StockPrice> buffer = new ArrayList<>(BATCH_SIZE);
-        int count = 0;
 
         try (Stream<String> lines = Files.lines(Paths.get(filePath))) {
             final Iterator<String> it = lines.skip(1).iterator();
@@ -125,7 +122,9 @@ public class StockDataLoader {
                 if (cols.length < 8) continue;
 
                 LocalDate date;
-                try { date = LocalDate.parse(cols[0]); } catch (DateTimeParseException e) { continue; }
+                try {
+                    date = LocalDate.parse(cols[0]);
+                } catch (DateTimeParseException e) { continue; }
 
                 Stock stock = stockCache.get(cols[7]);
                 if (stock == null) continue;
@@ -141,13 +140,11 @@ public class StockDataLoader {
                         .changeRate(parseBigDecimal(cols[6]))
                         .build());
 
-                count++;
                 if (buffer.size() >= BATCH_SIZE) {
                     stockPriceRepository.saveAll(buffer);
                     em.flush();
                     em.clear();
                     buffer.clear();
-                    System.out.println("StockPrice 처리: " + count + "줄");
                 }
             }
         }
@@ -155,7 +152,6 @@ public class StockDataLoader {
             stockPriceRepository.saveAll(buffer);
             em.flush();
             em.clear();
-            System.out.println("StockPrice 최종 처리: " + count + "줄");
         }
     }
 
@@ -176,6 +172,7 @@ public class StockDataLoader {
         for (int i = 0; i < tickerList.size(); i += checkSize){
             int end = Math.min(i + checkSize, tickerList.size());
             List<String> chunk = tickerList.subList(i ,end);
+
             stockRepository.findByTickerIn(chunk)
                     .forEach(stock -> stockMap.put(stock.getTicker(), stock));
         }
@@ -221,7 +218,6 @@ public class StockDataLoader {
                     em.flush();
                     em.clear();
                     buffer.clear();
-                    System.out.println("ValuationMetric 처리: " + count + "줄");
                 }
             }
         }
@@ -229,14 +225,13 @@ public class StockDataLoader {
             valuationMetricRepository.saveAll(buffer);
             em.flush();
             em.clear();
-            System.out.println("ValuationMetric 최종 처리: " + count + "줄");
         }
     }
 
     private boolean checkFileExistsOrSkip(String filePath) {
         Path path = Paths.get(filePath);
         if (!Files.exists(path)) {
-            System.out.println("CSV 파일이 존재하지 않아 스킵합니다: " + filePath);
+            System.out.println("CSV 파일이 존재하지 않습니다 : " + filePath);
             return false;
         }
         return true;
