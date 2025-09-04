@@ -14,8 +14,9 @@
     <link rel="stylesheet" href="/css/memo.css">
 
     <script src="/js/nav.js"></script>
+    <script src="/js/memo.js"></script>
 </head>
-<body>
+<body class="bg-dark text-white">
 
 <!-- NAVBAR -->
 <header>
@@ -27,7 +28,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>📝 작성 메모</h2>
         <div>
-            <a href="/dashboard" class="btn btn-outline-light btn-sm me-2">← 대시보드</a>
+            <a href="/" class="btn btn-outline-light btn-sm me-2">← 대시보드</a>
         </div>
     </div>
 
@@ -37,55 +38,31 @@
             <input type="text" class="form-control" placeholder="메모 제목/내용 검색..." id="searchMemo">
         </div>
         <div class="col-md-6 text-md-end">
-            <select class="form-select w-auto d-inline-block" id="sortOption">
-                <option value="latest">최신순</option>
-                <option value="oldest">오래된순</option>
-                <option value="title">제목순</option>
+            <!-- 서버 정렬 기반으로 select onchange 시 페이지 reload -->
+            <select class="form-select w-auto d-inline-block" id="sortOption"
+                    onchange="location.href='?sort=' + this.value;">
+                <option value="latest" th:selected="${sort == 'latest'}">최신순</option>
+                <option value="oldest" th:selected="${sort == 'oldest'}">오래된순</option>
+                <option value="title" th:selected="${sort == 'title'}">제목순</option>
             </select>
         </div>
     </div>
 
-    <!-- 메모 카드 목록 -->
-    <div class="row g-4">
-        <div class="col-md-6 col-lg-4">
-            <div class="card shadow-sm h-100 bg-dark text-white border-light">
-                <div class="card memo-card shadow-sm h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">삼성전자 분석</h5>
-                        <h6 class="card-subtitle mb-2">2025-08-17</h6>
-                        <p class="card-text">삼성전자 2분기 실적이 예상보다 양호했음. 반도체 부문 회복세...</p>
-                        <a href="/memo/1" class="btn btn-sm btn-outline-primary">자세히 보기</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6 col-lg-4">
-            <div class="card shadow-sm h-100 bg-dark text-white border-light">
-                <div class="card memo-card shadow-sm h-100">
-                    <div class="card-body">
-                        <h5 class="card-title text-primary">카카오 주가 전망</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">2025-08-15</h6>
-                        <p class="card-text">신규 서비스 런칭에 따른 주가 변동 가능성 검토. 투자 의견 보류...</p>
-                        <a href="/memo/2" class="btn btn-sm btn-outline-primary">자세히 보기</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6 col-lg-4">
-            <div class="card shadow-sm h-100 bg-dark text-white border-light">
-                <div class="card memo-card shadow-sm h-100">
-                    <div class="card-body">
-                        <h5 class="card-title text-primary">현대차 리서치</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">2025-08-10</h6>
-                        <p class="card-text">전기차 라인업 확대 및 글로벌 점유율 증가 기대. 유럽 시장 진출...</p>
-                        <a href="/memo/3" class="btn btn-sm btn-outline-primary">자세히 보기</a>
-                    </div>
+    <!-- 메모 카드 목록 (Thymeleaf 반복) -->
+    <div class="row g-4" id="memoContainer">
+        <div class="col-md-6 col-lg-4" th:each="memo : ${memoList}">
+            <div class="card shadow-sm h-100 bg-dark text-white border-light memo-card">
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${memo.title}">메모 제목</h5>
+                    <h6 class="card-subtitle mb-2 text-muted"
+                        th:text="${#temporals.format(memo.createdAt, 'yyyy-MM-dd')}">2025-08-17</h6>
+                    <p class="card-text" th:text="${memo.content}">메모 내용 미리보기...</p>
+                    <a th:href="@{/memo/{id}(id=${memo.id})}" class="btn btn-sm btn-outline-primary">자세히 보기</a>
                 </div>
             </div>
         </div>
     </div>
+
 </main>
 
 <!-- FOOTER -->

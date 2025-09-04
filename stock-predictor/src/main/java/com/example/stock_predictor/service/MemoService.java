@@ -47,4 +47,8 @@ public class MemoService {
     public Page<Memo> getUserMemosByStock(Long stockId, Long userId, Pageable pageable){
         return memoRepository.findByStockIdAndUserIdOrderByCreatedAtDesc(stockId, userId ,pageable);
     }
+
+    public Page<Memo> getMemoByUser(Long userId, Pageable pageable){
+        return memoRepository.findByUserId(userId, pageable);
+    }
 }
