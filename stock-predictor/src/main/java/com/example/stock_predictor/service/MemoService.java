@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -50,5 +51,9 @@ public class MemoService {
 
     public Page<Memo> getMemoByUser(Long userId, Pageable pageable){
         return memoRepository.findByUserId(userId, pageable);
+    }
+
+    public Optional<Memo> getMemoById(Long id){
+        return memoRepository.findById(id);
     }
 }

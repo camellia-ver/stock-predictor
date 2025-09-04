@@ -1,0 +1,56 @@
+/* 모달 전체 테마 */
+.modal-themed {
+    background-color: #121212; /* 검은색 계열 */
+    color: #ffffff; /* 기본 텍스트 흰색 */
+    font-family: 'Noto Sans', 'Noto Sans KR', sans-serif;
+    border-radius: 1rem;
+}
+
+/* 모달 상단 제목 ("메모 상세보기") */
+.modal-themed .modal-title {
+    color: #ffffff; /* 흰색 */
+    font-weight: 600;
+}
+
+/* 메모 제목 */
+.modal-themed #memoTitle {
+    color: #3399ff;       /* 진한 푸른색 계열 강조 */
+    font-weight: 800;      /* 굵게 */
+    font-size: 1.5rem;     /* 크기 증가 */
+    margin-bottom: 0.75rem;
+}
+
+/* 메모 내용 */
+.modal-themed #memoContent {
+    color: #e0e0e0;        /* 연한 회색, 흰색 대비 가독성 좋음 */
+    line-height: 1.6;
+}
+
+/* 날짜 */
+.modal-themed #memoDate {
+    color: #aaaaaa;        /* 회색 계열 */
+    font-size: 0.875rem;
+}
+
+/* 모달 닫기 버튼(우측 상단) */
+.modal-themed .btn-close {
+    filter: brightness(0) invert(1); /* 흰색으로 표시 */
+}
+
+/* 모달 푸터 버튼 */
+.modal-themed .btn-gradient {
+    background-color: #ffffff;
+    color: #0d6efd;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+}
+
+.modal-themed .btn-gradient:hover {
+    background: linear-gradient(135deg, #0d6efd, #6610f2);
+    color: #ffffff;
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+}

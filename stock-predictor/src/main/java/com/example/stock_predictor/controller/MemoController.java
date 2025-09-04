@@ -58,9 +58,4 @@ public class MemoController {
 
         return "memo";
     }
-
-    @GetMapping("/memo-detail")
-    public String memoDetail(){
-        return "memo-detail";
-    }
 }
