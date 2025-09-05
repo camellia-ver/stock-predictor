@@ -1,13 +1,7 @@
 package com.example.stock_predictor.service;
 
-import com.example.stock_predictor.model.Stock;
-import com.example.stock_predictor.model.StockIndexPrice;
-import com.example.stock_predictor.model.StockPrice;
-import com.example.stock_predictor.model.ValuationMetric;
-import com.example.stock_predictor.repository.StockIndexPriceRepository;
-import com.example.stock_predictor.repository.StockPriceRepository;
-import com.example.stock_predictor.repository.StockRepository;
-import com.example.stock_predictor.repository.ValuationMetricRepository;
+import com.example.stock_predictor.model.*;
+import com.example.stock_predictor.repository.*;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,22 +13,79 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
-public class StockDataLoader {
+public class StockDataLoaderService {
     private static final int BATCH_SIZE = 1000;
 
     private final StockRepository stockRepository;
     private final StockPriceRepository stockPriceRepository;
     private final StockIndexPriceRepository stockIndexPriceRepository;
     private final ValuationMetricRepository valuationMetricRepository;
+    private final PredictionRepository predictionRepository;
     private final EntityManager em;
+
+    @Transactional
+    public void loadPredictionCsv(String filePath) throws IOException{
+        if (!checkFileExistsOrSkip(filePath)) return;
+
+        List<Prediction> buffer = new ArrayList<>(BATCH_SIZE);
+
+        try (Stream<String> lines = Files.lines(Paths.get(filePath))) {
+            final Iterator<String> it = lines.skip(1).iterator();
+            while (it.hasNext()){
+                String[] cols = it.next().split(",",-1);
+
+                if (cols.length < 7) continue;
+
+                LocalDate predictionDate;
+                LocalDate targetDate;
+                LocalDateTime createdAt;
+
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+                try {
+                    predictionDate = LocalDate.parse(cols[1]);
+                    targetDate = LocalDate.parse(cols[2]);
+                    createdAt = LocalDateTime.parse(cols[6], formatter);
+                }catch (DateTimeParseException e){
+                    continue;
+                }
+
+                Stock stock = stockRepository.findById(parseLong(cols[0]))
+                        .orElseThrow(() -> new RuntimeException("해당 주식이 존재하지 않습니다."));
+
+                buffer.add(Prediction.builder()
+                        .stock(stock)
+                        .predictionDate(predictionDate)
+                        .targetDate(targetDate)
+                        .modelName(cols[3])
+                        .upProb(parseBigDecimal(cols[4]))
+                        .downProb(parseBigDecimal(cols[5]))
+                        .createdAt(createdAt)
+                        .build());
+
+                if (buffer.size() >= BATCH_SIZE){
+                    predictionRepository.saveAll(buffer);
+                    em.flush();
+                    em.clear();
+                    buffer.clear();
+                }
+            }
+        }
+        if (!buffer.isEmpty()){
+            predictionRepository.saveAll(buffer);
+            em.flush();
+            em.clear();
+            buffer.clear();
+        }
+    }
 
     public List<Stock> loadStockListCsv(String filePath) throws IOException {
         if (!checkFileExistsOrSkip(filePath)) return null;

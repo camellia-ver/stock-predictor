@@ -1,12 +1,11 @@
 package com.example.stock_predictor.initializer;
 
 import com.example.stock_predictor.model.Stock;
-import com.example.stock_predictor.model.ValuationMetric;
 import com.example.stock_predictor.repository.StockIndexPriceRepository;
 import com.example.stock_predictor.repository.StockPriceRepository;
 import com.example.stock_predictor.repository.StockRepository;
 import com.example.stock_predictor.repository.ValuationMetricRepository;
-import com.example.stock_predictor.service.StockDataLoader;
+import com.example.stock_predictor.service.StockDataLoaderService;
 import com.example.stock_predictor.utills.Formatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,9 +22,9 @@ import java.util.List;
 @RequiredArgsConstructor
 @PropertySource("classpath:paths.properties")
 public class StockDataInitializer implements ApplicationRunner {
-    @Value("${stockPrice.files.path}")
+    @Value("${stock.files.path}")
     private String stockFilesPath;
-    private final StockDataLoader stockDataLoader;
+    private final StockDataLoaderService dataLoaderService;
     private final StockRepository stockRepository;
     private final StockPriceRepository stockPriceRepository;
     private final StockIndexPriceRepository stockIndexPriceRepository;
@@ -39,23 +38,23 @@ public class StockDataInitializer implements ApplicationRunner {
 
         if (stockRepository.count() == 0){
             path = Paths.get(stockFilesPath, "stock_list.csv");
-            List<Stock> stocks = stockDataLoader.loadStockListCsv(path.toString());
+            List<Stock> stocks = dataLoaderService.loadStockListCsv(path.toString());
             stockRepository.saveAll(stocks);
         }
 
         if(stockPriceRepository.count() == 0){
             path = Paths.get(stockFilesPath, "all_korea_stock_price_" + formattedDate + ".csv");
-            stockDataLoader.loadStockPriceCsv(path.toString());
+            dataLoaderService.loadStockPriceCsv(path.toString());
         }
 
         if (stockIndexPriceRepository.count() == 0) {
             path = Paths.get(stockFilesPath, "all_korea_stock_index_price_" + formattedDate + ".csv");
-            stockDataLoader.loadStockIndexPriceCsv(path.toString());
+            dataLoaderService.loadStockIndexPriceCsv(path.toString());
         }
 
         if (valuationMetricRepository.count() == 0){
             path = Paths.get(stockFilesPath, "all_korea_valuation_" + formattedDate + ".csv");
-            stockDataLoader.loadValuationMetricCsv(path.toString());
+            dataLoaderService.loadValuationMetricCsv(path.toString());
         }
     }
 }

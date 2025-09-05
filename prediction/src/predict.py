@@ -39,7 +39,7 @@ for model_name, model_path in MODEL_PATHS.items():
         df_pred['model_name'] = model_name
         df_pred['upProb'] = y_proba
         df_pred['downProb'] = 1 - y_proba
-        df_pred['createdAt'] = datetime.now()
+        df_pred['createdAt'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         df_all_preds.append(df_pred)
 
