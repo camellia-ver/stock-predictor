@@ -3,7 +3,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 from dotenv import load_dotenv, find_dotenv
 import os
-from config import NEW_SQL_PATH
+from config import NEW_SQL_PATH, NEW_DATA_PATH
 
 load_dotenv(find_dotenv())
 
@@ -23,13 +23,14 @@ except SQLAlchemyError as e:
     print("DB 연결 실패:", e)
     raise
 
-SQL = open(NEW_SQL_PATH).read()
+with open(NEW_SQL_PATH, 'r', encoding='utf-8') as f:
+    SQL = f.read()
 
 try:
     df_new = pd.read_sql(text(SQL), conn)
     if df_new.empty:
         raise ValueError("조회된 데이터가 없습니다.")
-    df_new.to_parquet('data/new_data.parquet', index=False)
+    df_new.to_parquet(NEW_DATA_PATH, index=False)
     print(f"new_data.parquet 생성 완료: {df_new.shape[0]}건")
 except Exception as e:
     print("데이터 생성 실패:", e)

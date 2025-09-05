@@ -15,7 +15,8 @@ DB_NAME = os.getenv("DB_NAME")
 DB_URL = f'mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
 engine = create_engine(DB_URL)
 
-SQL = open(SQL_PATH).read()
+with open(SQL_PATH, 'r', encoding='utf-8') as f:
+    SQL = f.read()
 
 with engine.begin() as conn:
     df = pd.read_sql(text(SQL), conn)
@@ -27,8 +28,6 @@ print(f"데이터 shape: {df.shape}")
 print(df.head())
 
 print(df.isna().sum())
-
-os.makedirs('data', exist_ok=True)
 
 df.to_parquet(DATA_PATH, index=False)
 print('saved -> dataset_base.parquet')

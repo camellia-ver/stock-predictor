@@ -4,13 +4,10 @@ from features import add_technical_features, transform_features
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from dotenv import load_dotenv, find_dotenv
-from datetime import datetime, timedelta
+from datetime import datetime
 import os
 import time
-from config import TARGET_DAYS_LIST, MODEL_PATHS, PREPROCESSOR_PATH, NEW_DATA_PATH
-
-df_new = pd.read_parquet(NEW_DATA_PATH)
-df_new = add_technical_features(df_new)
+from config import MODEL_PATHS, PREPROCESSOR_PATH, NEW_DATA_PATH, TARGET_DAYS_LIST
 
 if not os.path.exists(NEW_DATA_PATH):
     raise FileNotFoundError(f"{NEW_DATA_PATH}가 존재하지 않습니다.")
@@ -44,6 +41,9 @@ except SQLAlchemyError as e:
 
 preprocessor = joblib.load(PREPROCESSOR_PATH)
 X_new = transform_features(df_new, preprocessor)
+X_new = pd.DataFrame(X_new, columns=preprocessor.get_feature_names_out())
+
+df_all_preds = []
 
 for model_name, model_path in MODEL_PATHS.items():
     if not os.path.exists(model_path):
@@ -51,28 +51,53 @@ for model_name, model_path in MODEL_PATHS.items():
         continue
 
     model = joblib.load(model_path)
+    y_proba = model.predict_proba(X_new)[:,1]
 
-    for days in TARGET_DAYS_LIST:
-        df_new['target_date'] = df_new['prediction_date'] + timedelta(days=3)
-        y_proba = model.predict_proba(X_new)[:,1]
-
+    for target_day in TARGET_DAYS_LIST:
         df_pred = df_new[['stock_id','prediction_date']].copy()
-        df_pred['target_date'] = df_pred['prediction_date'] + pd.Timedelta(days=1)
+        df_pred['target_date'] = df_pred['prediction_date'] + pd.Timedelta(days=target_day)
+
         df_pred['model_name'] = model_name
         df_pred['upProb'] = y_proba
         df_pred['downProb'] = 1 - y_proba
         df_pred['createdAt'] = datetime.now()
 
-        success = False
-        retries = 3
-        for attempt in range(retries):
-            try:
-                df_pred.to_sql('predictions', con=engine, if_exists='append', index=False)
-                print(f"{model_name} 예측 결과 DB 저장 완료")
-                success = True
-                break
-            except SQLAlchemyError as e:
-                print(f"[경고] DB 저장 실패 (재시도 {attempt+1}/{retries}): {e}")
-                time.sleep(2)
-        if not success:
-            print(f"[오류] {model_name} 결과를 DB에 저장하지 못했습니다.")
+        df_all_preds.append(df_pred)
+
+if df_all_preds:
+    df_all_preds = pd.concat(df_all_preds, ignore_index=True)
+
+for col in ['prediction_date','target_date','createdAt']:
+    df_all_preds[col] = pd.to_datetime(df_all_preds[col])
+
+for col in ['upProb','downProb']:
+    df_all_preds[col] = df_all_preds[col].astype(float)
+
+df_all_preds.rename(columns={
+    'upProb': 'up_prob',
+    'downProb': 'down_prob',
+    'createdAt': 'created_at'
+}, inplace=True)
+
+success = False
+retries = 3
+for attempt in range(retries):
+    try:
+        with engine.begin() as conn:
+            df_all_preds.to_sql(
+                'predictions',
+                con=conn,
+                if_exists='append',
+                index=False,
+                method='multi',
+                chunksize=5000
+            )
+        print("모든 예측 결과 DB 저장 완료")
+        success = True
+        break
+    except SQLAlchemyError as e:
+        print(f"[경고] DB 저장 실패 (재시도 {attempt+1}/{retries}): {e}")
+        time.sleep(2)
+
+if not success:
+    print("[오류] 결과를 DB에 저장하지 못했습니다.")
