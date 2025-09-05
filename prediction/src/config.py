@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 TARGET_DAYS_LIST =  [1, 3, 7] 
 
@@ -16,3 +17,5 @@ NEW_DATA_PATH = os.path.join(current_dir, "..", "data", "new_data.parquet")
 
 SQL_PATH = 'sql/build_dataset.sql'
 NEW_SQL_PATH = 'sql/build_new_data.sql'
+
+CSV_PATH = os.path.join(current_dir, "..", "result_data", f"predictions_{datetime.now().strftime('%Y_%m_%d')}.csv")
