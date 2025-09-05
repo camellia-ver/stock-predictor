@@ -6,6 +6,7 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "predictions")
@@ -32,4 +33,22 @@ public class Prediction {
     private BigDecimal downProb;
 
     private LocalDateTime createdAt;
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(stock.getId(), targetDate, modelName);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+
+        if (!(obj instanceof Prediction)) return false;
+
+        Prediction that = (Prediction) obj;
+
+        return stock.getId().equals(that.stock.getId()) &&
+                targetDate.equals(that.targetDate) &&
+                modelName.equals(that.modelName);
+    }
 }

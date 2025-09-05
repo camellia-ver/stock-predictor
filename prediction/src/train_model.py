@@ -50,21 +50,18 @@ for target_day in TARGET_DAYS_LIST:
     X_valid = pd.DataFrame(X_valid_np, columns=feature_cols) if X_valid_np is not None else None
 
     for model_name, model in models_to_train.items():
+        model_tag = f"{model_name}_{target_day}d"
         print(f"=== {model_name} 학습 시작 ({target_day}d) ===")
+
         model.fit(X_train, y_train)
         
         if X_valid is not None:
             y_pred = model.predict(X_valid)
-            
-            if hasattr(model, "predict_proba"):
-                y_proba = model.predict_proba(X_valid)[:, 1]
-            else:
-                # 확률 지원 안하는 모델 대비 fallback
-                y_proba = y_pred 
+            y_proba = model.predict_proba(X_valid)[:, 1] if hasattr(model, "predict_proba") else y_pred
 
-            print(f"{model_name} ({target_day}d) Accuracy:", accuracy_score(y_valid, y_pred))
-            print(f"{model_name} ({target_day}d) AUC:", roc_auc_score(y_valid, y_proba))
+            print(f"{model_tag} Accuracy:", accuracy_score(y_valid, y_pred))
+            print(f"{model_tag} AUC:", roc_auc_score(y_valid, y_proba))
 
-        model_path = MODEL_PATHS[model_name]
+        model_path = MODEL_PATHS[model_name].replace('.pkl', f'_{target_day}d.pkl')
         joblib.dump(model, model_path)
-        print(f"{model_name} ({target_day}d) 모델 저장 완료 -> {model_path}")
+        print(f"✅ {model_tag} 저장 완료 -> {model_path}")

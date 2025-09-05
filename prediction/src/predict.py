@@ -24,42 +24,31 @@ X_new = pd.DataFrame(X_new, columns=preprocessor.get_feature_names_out())
 
 df_all_preds = []
 
-for model_name, model_path in MODEL_PATHS.items():
-    if not os.path.exists(model_path):
-        print(f"[경고] {model_path} 파일이 존재하지 않아 건너뜁니다.")
-        continue
-
-    model = joblib.load(model_path)
-    y_proba = model.predict_proba(X_new)[:,1]
-
+for model_name, base_model_path in MODEL_PATHS.items():
     for target_day in TARGET_DAYS_LIST:
+        model_path = base_model_path.replace('.pkl',f'_{target_day}d.pkl')
+
+        if not os.path.exists(model_path):
+            print(f"[경고] {model_path} 없음 -> 건너뜀")
+            continue
+
+        model = joblib.load(model_path)
+        y_proba = model.predict_proba(X_new)[:,1]
+
         df_pred = df_new[['stock_id','prediction_date']].copy()
         df_pred['target_date'] = df_pred['prediction_date'] + pd.Timedelta(days=target_day)
-
-        df_pred['model_name'] = model_name
-        df_pred['upProb'] = y_proba
-        df_pred['downProb'] = 1 - y_proba
-        df_pred['createdAt'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        df_pred['model_name'] = f"{model_name}_{target_day}d"
+        df_pred['up_prob'] = y_proba
+        df_pred['down_prob'] = 1 - y_proba
+        df_pred['created_at'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         df_all_preds.append(df_pred)
 
 if df_all_preds:
     df_all_preds = pd.concat(df_all_preds, ignore_index=True)
+    df_all_preds = df_all_preds.drop_duplicates(subset=['stock_id', 'target_date', 'model_name'])
 
-for col in ['prediction_date','target_date','createdAt']:
-    df_all_preds[col] = pd.to_datetime(df_all_preds[col])
-
-for col in ['upProb','downProb']:
-    df_all_preds[col] = df_all_preds[col].astype(float)
-
-df_all_preds.rename(columns={
-    'upProb': 'up_prob',
-    'downProb': 'down_prob',
-    'createdAt': 'created_at'
-}, inplace=True)
-
-try:
     df_all_preds.to_csv(CSV_PATH, index=False, encoding='utf-8-sig')
-    print(f"모든 예측 결과 CSV 저장 완료: {CSV_PATH}")
-except Exception as e:
-    print(f"[오류] CSV 저장 실패: {e}")
+    print(f"✅ 모든 예측 결과 CSV 저장 완료: {CSV_PATH}")
+else:
+    print("⚠️ 예측 결과가 생성되지 않았습니다.")
