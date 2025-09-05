@@ -44,7 +44,7 @@ for target_day in TARGET_DAYS_LIST:
 
     _, X_train_np, X_valid_np = build_preprocessor(train_df, valid_df)
 
-    feature_cols = train_df.drop(columns=[y_col]).columns
+    feature_cols = preprocessor.get_feature_names_out()
 
     X_train = pd.DataFrame(X_train_np, columns=feature_cols)
     X_valid = pd.DataFrame(X_valid_np, columns=feature_cols) if X_valid_np is not None else None

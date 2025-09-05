@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 
-TARGET_DAYS_LIST =  [1, 3, 7] 
+TARGET_DAYS_LIST =  [7, 30, 60] 
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
