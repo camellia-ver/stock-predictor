@@ -26,8 +26,7 @@ public class StockDataScheduler {
     private final StockDataLoader stockDataLoader;
     private final StockService stockService;
 
-//    @Scheduled(cron = "0 55 8 ? * TUE-SAT")
-    @Scheduled(cron = "0 51 16 ? * TUE-SAT")
+    @Scheduled(cron = "0 55 8 ? * TUE-SAT")
     public void updateDailyStockData() throws IOException {
         Formatter formatter = new Formatter();
         String formattedDate = formatter.formattingDate();

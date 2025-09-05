@@ -9,13 +9,17 @@ import pandas as pd
 from datetime import datetime
 from pykrx import stock
 from sqlalchemy import create_engine
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 
 class StockDataCollector:
-    def __init__(self, db_env=True, folder="stock_price_data"):
-        self.folder = folder
+    def __init__(self, db_env=True, folder="data_save/stock_price_data"):
+        current_file_dir = os.path.dirname(os.path.abspath(__file__))
+
+        self.folder = os.path.join(current_file_dir, "stock_price_data")
+        os.makedirs(self.folder, exist_ok=True)
+        
         if db_env:
-            load_dotenv()
+            load_dotenv(find_dotenv())
             DB_USER = os.getenv("DB_USER")
             DB_PASSWORD = os.getenv("DB_PASSWORD")
             DB_HOST = os.getenv("DB_HOST")
@@ -42,7 +46,7 @@ class StockDataCollector:
     def save_to_csv(self, df ,file_name, prefix=None):
         os.makedirs(self.folder, exist_ok=True)
         if prefix is not None:
-            file_name = f"{prefix}_{file_name}_{datetime.now().strftime('%Y_%m_%d_%H%M%S')}.csv"
+            file_name = f"{prefix}_{file_name}_{datetime.now().strftime('%Y_%m_%d')}.csv"
 
         file_path = os.path.abspath(os.path.join(self.folder, file_name))
         df.to_csv(file_path, index=False, encoding="utf-8-sig")
@@ -96,12 +100,27 @@ class StockDataCollector:
                 kospi_set = set(kospi_tickers)
                 all_tickers = kospi_tickers + kosdaq_tickers
 
+                try:
+                    kospi_sector_df = stock.get_market_sector_classifications(today, 'KOSPI')
+                except:
+                    kospi_sector_df = pd.DataFrame(columns=['종목명','업종명'])
+                
+                try:
+                    kosdaq_sector_df = stock.get_market_sector_classifications(today, 'KOSDAQ')
+                except:
+                    kosdaq_sector_df = pd.DataFrame(columns=['종목명','업종명'])
+                        
+                sector_df = pd.concat([kospi_sector_df,kosdaq_sector_df])
+                sector_map = sector_df['업종명'].to_dict()
+
+                data = []
                 for ticker in all_tickers:
                     for retry in range(3):
                         try:
                             name = stock.get_market_ticker_name(ticker)
                             market_type = "KOSPI" if ticker in kospi_set else "KOSDAQ"
-                            data.append([ticker, name, market_type, 'Unknown', today])
+                            sector = sector_map.get(ticker, 'Unknown')
+                            data.append([ticker, name, market_type, sector, today])
                             break
                         except Exception as e:
                             print(f"⚠️ {ticker} 조회 실패: {e}. 재시도 {retry+1}/3")
@@ -178,28 +197,28 @@ class StockDataCollector:
         return tickers_df['ticker'].tolist()
 
 if __name__ == "__main__":
-    # start_date = input("시작 날짜 (YYYY-MM-DD): ")
-    # end_date = input("종료 날짜 (YYYY-MM-DD): ")
-    # file_prefix = input("파일명 접두사 선택 (new / all): ")
+    start_date = input("시작 날짜 (YYYY-MM-DD): ")
+    end_date = input("종료 날짜 (YYYY-MM-DD): ")
+    file_prefix = input("파일명 접두사 선택 (new / all): ")
 
     collector = StockDataCollector()
 
     # 1️⃣ 주식 리스트
-    df_stock = collector.get_korea_stock()
-    collector.save_to_csv(df_stock, file_name="stock_list.csv")
+    # df_stock = collector.get_korea_stock()
+    # collector.save_to_csv(df_stock, file_name="stock_list.csv")
 
-    # # 2️⃣ 지수 OHLCV
-    # def wrapper_index(name): return collector.fetch_index_ohlcv(name, start_date, end_date)
-    # df_indices = collector.process_in_batches(list(collector.main_index.keys()), batch_size=2, process_func=wrapper_index)
-    # collector.save_to_csv(df_indices,file_name="korea_stock_index",file_prefix)
+    # 2️⃣ 지수 OHLCV
+    def wrapper_index(name): return collector.fetch_index_ohlcv(name, start_date, end_date)
+    df_indices = collector.process_in_batches(list(collector.main_index.keys()), batch_size=2, process_func=wrapper_index)
+    collector.save_to_csv(df_indices,"korea_stock_index_price",file_prefix)
 
-    # # 3️⃣ 주식 밸류에이션
-    # tickers = collector.get_tickers_from_db()
-    # def wrapper_val(t): return collector.fetch_stock_valuation(t, start_date, end_date)
-    # df_val = collector.process_in_batches(tickers, batch_size=50, process_func=wrapper_val)
-    # collector.save_to_csv(df_val, file_name="korea_stock_valuation",file_prefix)
+    # 3️⃣ 주식 밸류에이션
+    tickers = collector.get_tickers_from_db()
+    def wrapper_val(t): return collector.fetch_stock_valuation(t, start_date, end_date)
+    df_val = collector.process_in_batches(tickers, batch_size=50, process_func=wrapper_val)
+    collector.save_to_csv(df_val, "korea_valuation",file_prefix)
 
-    # # 4️⃣ 주식 OHLCV
-    # def wrapper_ohlcv(t): return collector.fetch_stock_ohlcv(t, start_date, end_date)
-    # df_ohlcv = collector.process_in_batches(tickers, batch_size=50, process_func=wrapper_ohlcv)
-    # collector.save_to_csv(df_ohlcv, file_name="korea_stock_ohlcv",file_prefix)
+    # 4️⃣ 주식 OHLCV
+    def wrapper_ohlcv(t): return collector.fetch_stock_ohlcv(t, start_date, end_date)
+    df_ohlcv = collector.process_in_batches(tickers, batch_size=50, process_func=wrapper_ohlcv)
+    collector.save_to_csv(df_ohlcv, "korea_stock_price",file_prefix)
