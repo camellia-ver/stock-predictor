@@ -6,7 +6,10 @@ from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
 import os
-from config import DATA_PATH, PREPROCESSOR_PATH, TARGET_DAYS_LIST, MODEL_PATHS
+from config import DATA_PATH, PREPROCESSOR_PATH, TARGET_DAYS_LIST, MODEL_PATHS, DATA_DIR_PATH
+from utils import merge_parquet_files
+
+merge_parquet_files(DATA_DIR_PATH, DATA_PATH)
 
 df = pd.read_parquet(DATA_PATH)
 df = add_technical_features(df)

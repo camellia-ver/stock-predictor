@@ -14,6 +14,7 @@ MODEL_PATHS = {
 PREPROCESSOR_PATH = os.path.join(current_dir, "..", "models", "preprocessor.pkl")
 DATA_PATH =  os.path.join(current_dir, "..", "data", "dataset_base.parquet")
 NEW_DATA_PATH = os.path.join(current_dir, "..", "data", "new_data.parquet")
+DATA_DIR_PATH = os.path.join(current_dir,'..','data')
 
 SQL_PATH = 'sql/build_dataset.sql'
 NEW_SQL_PATH = 'sql/build_new_data.sql'
