@@ -11,6 +11,8 @@ data_save/.env
 *.tmp
 *.csv
 *.sql
+*.parquet
+*.pkl
 
 # OS 별 파일
 .DS_Store

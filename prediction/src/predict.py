@@ -7,7 +7,7 @@ from dotenv import load_dotenv, find_dotenv
 from datetime import datetime, timedelta
 import os
 import time
-from src import TARGET_DAYS_LIST, MODEL_PATHS, PREPROCESSOR_PATH, NEW_DATA_PATH
+from config import TARGET_DAYS_LIST, MODEL_PATHS, PREPROCESSOR_PATH, NEW_DATA_PATH
 
 df_new = pd.read_parquet(NEW_DATA_PATH)
 df_new = add_technical_features(df_new)
