@@ -1,4 +1,4 @@
-package com.example.stock_predictor.utills;
+package com.example.stock_predictor.utill;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

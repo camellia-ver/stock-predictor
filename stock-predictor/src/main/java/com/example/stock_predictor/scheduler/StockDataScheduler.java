@@ -1,9 +1,12 @@
 package com.example.stock_predictor.scheduler;
 
 import com.example.stock_predictor.model.Stock;
-import com.example.stock_predictor.service.StockDataLoaderService;
+import com.example.stock_predictor.service.StockDataLoadService;
 import com.example.stock_predictor.service.StockService;
-import com.example.stock_predictor.utills.Formatter;
+import com.example.stock_predictor.service.loader.*;
+import com.example.stock_predictor.utill.DateFormatterUtil;
+import com.opencsv.exceptions.CsvValidationException;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -25,31 +28,35 @@ public class StockDataScheduler {
     @Value("${stockPrediction.files.path}")
     private String stockPredictionPath;
 
-    private final StockDataLoaderService dataLoaderService;
+    private final StockCsvLoaderService stockCsvLoaderService;
+    private final StockPriceCsvLoaderService stockPriceCsvLoaderService;
+    private final StockIndexPriceCsvLoaderService stockIndexPriceCsvLoaderService;
+    private final ValuationMetricCsvLoaderService valuationMetricCsvLoaderService;
+    private final PredictionCsvLoaderService predictionCsvLoaderService;
     private final StockService stockService;
 
     @Scheduled(cron = "0 55 8 ? * TUE-SAT")
-    public void updateDailyStockData() throws IOException {
-        Formatter formatter = new Formatter();
-        String formattedDate = formatter.formattingDate();
+    public void updateDailyStockData() throws IOException, CsvValidationException {
+        DateFormatterUtil dateFormatterUtil = new DateFormatterUtil();
+        String formattedDate = dateFormatterUtil.formattingDate();
 
         Path path = Paths.get(stockFilesPath, "new_korea_stock_price_" + formattedDate + ".csv");
-        dataLoaderService.loadStockPriceCsv(path.toString());
+        stockPriceCsvLoaderService.load(path.toString());
 
         path = Paths.get(stockFilesPath, "new_korea_stock_index_price_" + formattedDate + ".csv");
-        dataLoaderService.loadStockIndexPriceCsv(path.toString());
+        stockIndexPriceCsvLoaderService.load(path.toString());
 
         path = Paths.get(stockFilesPath, "new_korea_valuation_" + formattedDate + ".csv");
-        dataLoaderService.loadValuationMetricCsv(path.toString());
+        valuationMetricCsvLoaderService.load(path.toString());
 
         path = Paths.get(stockPredictionPath,"predictions_" + formattedDate + ".csv");
-        dataLoaderService.loadPredictionCsv(path.toString());
+        predictionCsvLoaderService.load(path.toString());
     }
 
     @Scheduled(cron = "0 55 8 1 * ?")
-    public void updateMonthlyStockList() throws IOException{
+    public void updateMonthlyStockList() throws IOException, CsvValidationException {
         Path path = Paths.get(stockFilesPath, "stock_list.csv");
-        List<Stock> stockList = dataLoaderService.loadStockListCsv(path.toString());
+        List<Stock> stockList = stockCsvLoaderService.load(path.toString());
         stockService.syncWithCsv(stockList);
     }
 }

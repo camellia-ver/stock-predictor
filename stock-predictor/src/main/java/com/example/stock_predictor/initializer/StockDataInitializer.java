@@ -5,8 +5,12 @@ import com.example.stock_predictor.repository.StockIndexPriceRepository;
 import com.example.stock_predictor.repository.StockPriceRepository;
 import com.example.stock_predictor.repository.StockRepository;
 import com.example.stock_predictor.repository.ValuationMetricRepository;
-import com.example.stock_predictor.service.StockDataLoaderService;
-import com.example.stock_predictor.utills.Formatter;
+import com.example.stock_predictor.service.StockDataLoadService;
+import com.example.stock_predictor.service.loader.StockCsvLoaderService;
+import com.example.stock_predictor.service.loader.StockIndexPriceCsvLoaderService;
+import com.example.stock_predictor.service.loader.StockPriceCsvLoaderService;
+import com.example.stock_predictor.service.loader.ValuationMetricCsvLoaderService;
+import com.example.stock_predictor.utill.DateFormatterUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
@@ -24,7 +28,12 @@ import java.util.List;
 public class StockDataInitializer implements ApplicationRunner {
     @Value("${stock.files.path}")
     private String stockFilesPath;
-    private final StockDataLoaderService dataLoaderService;
+
+    private final StockCsvLoaderService stockCsvLoaderService;
+    private final StockPriceCsvLoaderService stockPriceCsvLoaderService;
+    private final StockIndexPriceCsvLoaderService stockIndexPriceCsvLoaderService;
+    private final ValuationMetricCsvLoaderService valuationMetricCsvLoaderService;
+
     private final StockRepository stockRepository;
     private final StockPriceRepository stockPriceRepository;
     private final StockIndexPriceRepository stockIndexPriceRepository;
@@ -32,29 +41,33 @@ public class StockDataInitializer implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        Formatter formatter = new Formatter();
-        String formattedDate = formatter.formattingDate();
+        DateFormatterUtil dateFormatterUtil = new DateFormatterUtil();
+        String formattedDate = dateFormatterUtil.formattingDate();
         Path path = null;
 
-        if (stockRepository.count() == 0){
+        // 1. 주식 리스트 초기화
+        if (stockRepository.count() == 0) {
             path = Paths.get(stockFilesPath, "stock_list.csv");
-            List<Stock> stocks = dataLoaderService.loadStockListCsv(path.toString());
+            List<Stock> stocks = stockCsvLoaderService.load(path.toString());
             stockRepository.saveAll(stocks);
         }
 
-        if(stockPriceRepository.count() == 0){
+        // 2. 주식 가격 데이터 초기화
+        if (stockPriceRepository.count() == 0) {
             path = Paths.get(stockFilesPath, "all_korea_stock_price_" + formattedDate + ".csv");
-            dataLoaderService.loadStockPriceCsv(path.toString());
+            stockPriceCsvLoaderService.load(path.toString());
         }
 
+        // 3. 주가지수 가격 데이터 초기화
         if (stockIndexPriceRepository.count() == 0) {
             path = Paths.get(stockFilesPath, "all_korea_stock_index_price_" + formattedDate + ".csv");
-            dataLoaderService.loadStockIndexPriceCsv(path.toString());
+            stockIndexPriceCsvLoaderService.load(path.toString());
         }
 
-        if (valuationMetricRepository.count() == 0){
+        // 4. 밸류에이션 메트릭 초기화
+        if (valuationMetricRepository.count() == 0) {
             path = Paths.get(stockFilesPath, "all_korea_valuation_" + formattedDate + ".csv");
-            dataLoaderService.loadValuationMetricCsv(path.toString());
+            valuationMetricCsvLoaderService.load(path.toString());
         }
     }
 }
