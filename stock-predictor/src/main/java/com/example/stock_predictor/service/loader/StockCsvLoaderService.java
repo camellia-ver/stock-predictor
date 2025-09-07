@@ -5,6 +5,7 @@ import com.example.stock_predictor.repository.StockRepository;
 import com.example.stock_predictor.util.CsvUtils;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ public class StockCsvLoaderService {
 
     private static final int BATCH_SIZE = 1000;
     private final StockRepository stockRepository;
+    private final EntityManager em;
 
     public List<Stock> load(String filePath) throws IOException, CsvValidationException {
         if (!CsvUtils.fileExists(filePath)) {
@@ -56,6 +58,8 @@ public class StockCsvLoaderService {
 
                 if (buffer.size() >= BATCH_SIZE) {
                     stockRepository.saveAll(buffer);
+                    em.flush();
+                    em.clear();
                     buffer.clear();
                 }
             }
@@ -63,6 +67,8 @@ public class StockCsvLoaderService {
 
         if (!buffer.isEmpty()) {
             stockRepository.saveAll(buffer);
+            em.flush();
+            em.clear();
         }
 
         return buffer;

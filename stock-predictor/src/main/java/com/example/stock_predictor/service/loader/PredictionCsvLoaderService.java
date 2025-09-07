@@ -8,6 +8,7 @@ import com.example.stock_predictor.util.CsvUtils;
 import com.example.stock_predictor.util.NumberParseUtils;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,7 @@ public class PredictionCsvLoaderService {
     private static final int BATCH_SIZE = 1000;
     private final PredictionRepository repository;
     private final StockRepository stockRepository;
-
+    private final EntityManager em;
     private static final DateTimeFormatter DATETIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public void load(String filePath) throws IOException, CsvValidationException {
@@ -76,16 +77,19 @@ public class PredictionCsvLoaderService {
                         .createdAt(createdAt)
                         .build());
 
-                saveBatchIfNeeded(buffer);
+                if (buffer.size() >= BATCH_SIZE) {
+                    repository.saveAll(buffer);
+                    em.flush();
+                    em.clear();
+                    buffer.clear();
+                }
             }
         }
 
-        saveBatchIfNeeded(buffer);
-    }
-
-    private void saveBatchIfNeeded(List<Prediction> buffer) {
-        if (!buffer.isEmpty() && buffer.size() >= BATCH_SIZE) {
+        if (!buffer.isEmpty()) {
             repository.saveAll(buffer);
+            em.flush();
+            em.clear();
             buffer.clear();
         }
     }

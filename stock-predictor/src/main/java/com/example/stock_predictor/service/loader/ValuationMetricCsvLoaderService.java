@@ -8,6 +8,7 @@ import com.example.stock_predictor.util.CsvUtils;
 import com.example.stock_predictor.util.NumberParseUtils;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,10 +22,10 @@ import java.util.*;
 @RequiredArgsConstructor
 @Slf4j
 public class ValuationMetricCsvLoaderService {
-
     private static final int BATCH_SIZE = 1000;
     private final ValuationMetricRepository repository;
     private final StockRepository stockRepository;
+    private final EntityManager em;
 
     public void load(String filePath) throws IOException, CsvValidationException {
         if (!CsvUtils.fileExists(filePath)) {
@@ -60,11 +61,21 @@ public class ValuationMetricCsvLoaderService {
                         .dividendYield(NumberParseUtils.parseBigDecimalOrNull(cols[5]))
                         .build());
 
-                saveBatchIfNeeded(buffer);
+                if (buffer.size() >= BATCH_SIZE) {
+                    repository.saveAll(buffer);
+                    em.flush();
+                    em.clear();
+                    buffer.clear();
+                }
             }
         }
 
-        saveBatchIfNeeded(buffer);
+        if (!buffer.isEmpty()) {
+            repository.saveAll(buffer);
+            em.flush();
+            em.clear();
+            buffer.clear();
+        }
     }
 
     private Map<String, Stock> loadStockCache(String filePath) throws IOException, CsvValidationException {
@@ -82,12 +93,5 @@ public class ValuationMetricCsvLoaderService {
         stockRepository.findByTickerIn(new ArrayList<>(tickers))
                 .forEach(stock -> stockMap.put(stock.getTicker(), stock));
         return stockMap;
-    }
-
-    private void saveBatchIfNeeded(List<ValuationMetric> buffer) {
-        if (!buffer.isEmpty() && buffer.size() >= BATCH_SIZE) {
-            repository.saveAll(buffer);
-            buffer.clear();
-        }
     }
 }
