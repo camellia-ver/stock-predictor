@@ -12,8 +12,10 @@ class BaseCollector:
         os.makedirs(self.folder, exist_ok=True)
 
     def save_to_csv(self, df ,file_name, prefix=None):
-        if prefix:
+        if prefix == 'new':
             file_name = f"{prefix}_{file_name}_{datetime.now().strftime('%Y_%m_%d')}.csv"
+        else:
+            file_name = f"{prefix}_{file_name}.csv"
 
         file_path = os.path.abspath(os.path.join(self.folder, file_name))
         df.to_csv(file_path, index=False, encoding="utf-8-sig")
