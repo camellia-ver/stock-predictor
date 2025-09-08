@@ -6,17 +6,19 @@ import java.math.RoundingMode;
 public class Calculator {
     public record IndexStatus(boolean isRising, BigDecimal rate){}
 
-    public IndexStatus calculateIndex(BigDecimal close, BigDecimal open){
-        boolean isRising = false;
-        BigDecimal rate = BigDecimal.ZERO;
+    private static final BigDecimal HUNDRED = BigDecimal.valueOf(100);
 
-        if (close != null && open != null) {
-            isRising = close.compareTo(open) > 0;
-            rate = close.subtract(open)
-                    .divide(open, 4, RoundingMode.HALF_UP)
-                    .multiply(new BigDecimal("100"));
+    public IndexStatus calculateIndex(BigDecimal close, BigDecimal open){
+        if (close == null || open == null || open.compareTo(BigDecimal.ZERO) == 0){
+            return new IndexStatus(false, BigDecimal.ZERO);
         }
 
+        boolean isRising = close.compareTo(open) > 0;
+        BigDecimal rate = close.subtract(open)
+                .divide(open, 8, RoundingMode.HALF_UP)
+                .multiply(HUNDRED)
+                .setScale(2, RoundingMode.HALF_UP);
+        
         return new IndexStatus(isRising, rate);
     }
 }
