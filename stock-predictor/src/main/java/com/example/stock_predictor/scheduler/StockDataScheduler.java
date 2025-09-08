@@ -1,12 +1,10 @@
 package com.example.stock_predictor.scheduler;
 
 import com.example.stock_predictor.model.Stock;
-import com.example.stock_predictor.service.StockDataLoadService;
 import com.example.stock_predictor.service.StockService;
 import com.example.stock_predictor.service.loader.*;
-import com.example.stock_predictor.utill.DateFormatterUtil;
+import com.example.stock_predictor.util.DateFormatterUtil;
 import com.opencsv.exceptions.CsvValidationException;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;

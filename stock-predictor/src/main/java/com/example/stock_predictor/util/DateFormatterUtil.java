@@ -1,4 +1,4 @@
-package com.example.stock_predictor.utill;
+package com.example.stock_predictor.util;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

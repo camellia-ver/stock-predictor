@@ -1,15 +1,16 @@
-package com.example.stock_predictor.utill;
+package com.example.stock_predictor.util;
 
 import com.example.stock_predictor.model.Stock;
 import com.example.stock_predictor.repository.StockRepository;
-import com.example.stock_predictor.utill.CsvUtils;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.*;
 
+@Component
 @RequiredArgsConstructor
 public class StockCacheLoader {
     private static final int TICKER_COLUMN_INDEX = 7;

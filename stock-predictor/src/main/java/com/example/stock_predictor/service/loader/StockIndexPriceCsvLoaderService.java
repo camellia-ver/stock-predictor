@@ -2,8 +2,8 @@ package com.example.stock_predictor.service.loader;
 
 import com.example.stock_predictor.model.StockIndexPrice;
 import com.example.stock_predictor.repository.StockIndexPriceRepository;
-import com.example.stock_predictor.util.CsvUtils;
 import com.example.stock_predictor.util.NumberParseUtils;
+import com.example.stock_predictor.util.CsvUtils;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import jakarta.persistence.EntityManager;

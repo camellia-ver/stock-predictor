@@ -7,7 +7,7 @@ import com.example.stock_predictor.model.StockPrice;
 import com.example.stock_predictor.service.FavoriteService;
 import com.example.stock_predictor.service.StockIndexPriceService;
 import com.example.stock_predictor.service.StockPriceService;
-import com.example.stock_predictor.utill.Calculator;
+import com.example.stock_predictor.util.Calculator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
