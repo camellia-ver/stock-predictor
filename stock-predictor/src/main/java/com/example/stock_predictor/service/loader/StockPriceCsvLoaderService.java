@@ -4,8 +4,9 @@ import com.example.stock_predictor.model.Stock;
 import com.example.stock_predictor.model.StockPrice;
 import com.example.stock_predictor.repository.StockPriceRepository;
 import com.example.stock_predictor.repository.StockRepository;
-import com.example.stock_predictor.util.CsvUtils;
 import com.example.stock_predictor.util.NumberParseUtils;
+import com.example.stock_predictor.utill.CsvUtils;
+import com.example.stock_predictor.utill.StockCacheLoader;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import jakarta.persistence.EntityManager;
@@ -23,8 +24,8 @@ import java.util.*;
 @Slf4j
 public class StockPriceCsvLoaderService {
     private static final int BATCH_SIZE = 1000;
+    private final StockCacheLoader stockCacheLoader;
     private final StockPriceRepository stockPriceRepository;
-    private final StockRepository stockRepository;
     private final EntityManager em;
 
     public void load(String filePath) throws IOException, CsvValidationException {
@@ -33,7 +34,7 @@ public class StockPriceCsvLoaderService {
             return;
         }
 
-        Map<String, Stock> stockCache = loadStockCache(filePath);
+        Map<String, Stock> stockCache = stockCacheLoader.loadStockCache(filePath);
         List<StockPrice> buffer = new ArrayList<>(BATCH_SIZE);
 
         try (CSVReader reader = CsvUtils.openCsvReader(filePath)) {
@@ -75,22 +76,5 @@ public class StockPriceCsvLoaderService {
             em.clear();
             buffer.clear();
         }
-    }
-
-    private Map<String, Stock> loadStockCache(String filePath) throws IOException, CsvValidationException {
-        Set<String> tickers = new HashSet<>();
-
-        try (CSVReader reader = CsvUtils.openCsvReader(filePath)) {
-            CsvUtils.skipHeader(reader);
-            String[] cols;
-            while ((cols = reader.readNext()) != null) {
-                if (cols.length >= 8) tickers.add(cols[7]);
-            }
-        }
-
-        Map<String, Stock> stockMap = new HashMap<>();
-        stockRepository.findByTickerIn(new ArrayList<>(tickers))
-                .forEach(stock -> stockMap.put(stock.getTicker(), stock));
-        return stockMap;
     }
 }

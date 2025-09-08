@@ -6,6 +6,8 @@ import com.example.stock_predictor.repository.StockRepository;
 import com.example.stock_predictor.repository.ValuationMetricRepository;
 import com.example.stock_predictor.util.CsvUtils;
 import com.example.stock_predictor.util.NumberParseUtils;
+import com.example.stock_predictor.utill.CsvUtils;
+import com.example.stock_predictor.utill.StockCacheLoader;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import jakarta.persistence.EntityManager;
@@ -24,7 +26,7 @@ import java.util.*;
 public class ValuationMetricCsvLoaderService {
     private static final int BATCH_SIZE = 1000;
     private final ValuationMetricRepository repository;
-    private final StockRepository stockRepository;
+    private final StockCacheLoader stockCacheLoader;
     private final EntityManager em;
 
     public void load(String filePath) throws IOException, CsvValidationException {
@@ -33,7 +35,7 @@ public class ValuationMetricCsvLoaderService {
             return;
         }
 
-        Map<String, Stock> stockCache = loadStockCache(filePath);
+        Map<String, Stock> stockCache = stockCacheLoader.loadStockCache(filePath);
         List<ValuationMetric> buffer = new ArrayList<>(BATCH_SIZE);
 
         try (CSVReader reader = CsvUtils.openCsvReader(filePath)) {
@@ -76,22 +78,5 @@ public class ValuationMetricCsvLoaderService {
             em.clear();
             buffer.clear();
         }
-    }
-
-    private Map<String, Stock> loadStockCache(String filePath) throws IOException, CsvValidationException {
-        Set<String> tickers = new HashSet<>();
-
-        try (CSVReader reader = CsvUtils.openCsvReader(filePath)) {
-            CsvUtils.skipHeader(reader);
-            String[] cols;
-            while ((cols = reader.readNext()) != null) {
-                if (cols.length >= 8) tickers.add(cols[7]);
-            }
-        }
-
-        Map<String, Stock> stockMap = new HashMap<>();
-        stockRepository.findByTickerIn(new ArrayList<>(tickers))
-                .forEach(stock -> stockMap.put(stock.getTicker(), stock));
-        return stockMap;
     }
 }

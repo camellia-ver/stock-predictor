@@ -1,4 +1,4 @@
-package com.example.stock_predictor.util;
+package com.example.stock_predictor.utill;
 
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
