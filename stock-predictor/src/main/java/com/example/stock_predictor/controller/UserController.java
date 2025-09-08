@@ -51,7 +51,7 @@ public class UserController {
 
         model.addAttribute("user",dto);
 
-        List<Favorite> favorites = favoriteService.getFavorites(userDetails.getUsername(), false);
+        List<Favorite> favorites = favoriteService.getFavoritesLimited(userDetails.getUsername(), false);
         List<FavoriteDTO> favoriteDTO = favorites.stream()
                         .map(f -> new FavoriteDTO(f.getStock().getName(),f.getStock().getTicker()))
                                 .collect(Collectors.toList());

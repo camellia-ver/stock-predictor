@@ -30,7 +30,7 @@ public class FavoritesController {
                             @AuthenticationPrincipal UserDetails userDetails,
                             @RequestParam(defaultValue = "0") int page){
         int pageSize = 10;
-        Page<Favorite> favoritesPage = favoriteService.getFavorites (userDetails.getUsername(),page,pageSize);
+        Page<Favorite> favoritesPage = favoriteService.getFavoritesPage(userDetails.getUsername(),page,pageSize);
 
         List<StockWithPriceDTO> favoritesDTO = favoritesPage.stream()
                 .map(f -> {
