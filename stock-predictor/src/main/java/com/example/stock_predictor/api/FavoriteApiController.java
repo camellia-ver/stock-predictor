@@ -1,5 +1,6 @@
 package com.example.stock_predictor.api;
 
+import com.example.stock_predictor.dto.FavoriteResponseDTO;
 import com.example.stock_predictor.model.Stock;
 import com.example.stock_predictor.model.User;
 import com.example.stock_predictor.service.FavoriteService;
@@ -28,7 +29,7 @@ public class FavoriteApiController {
     private final FavoriteService favoriteService;
 
     @PostMapping("/toggle")
-    public ResponseEntity<Map<String, Object>> toggleFavorite(
+    public ResponseEntity<FavoriteResponseDTO> toggleFavorite(
             @RequestParam String ticker,
             @AuthenticationPrincipal UserDetails userDetails
             ){
@@ -38,11 +39,10 @@ public class FavoriteApiController {
 
         User user = userService.findByEmail(userDetails.getUsername());
         Stock stock = stockService.getStockByTicker(ticker);
+        if (stock == null) return ResponseEntity.notFound().build();
 
         boolean isNowFavorite = favoriteService.toggleFavorite(user, stock);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("isFavorite", isNowFavorite);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new FavoriteResponseDTO(isNowFavorite));
     }
 }

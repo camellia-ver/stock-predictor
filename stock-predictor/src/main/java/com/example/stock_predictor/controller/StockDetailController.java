@@ -34,10 +34,10 @@ public class StockDetailController {
                               @AuthenticationPrincipal UserDetails userDetails
                               ){
         Stock stock = stockService.getStockByTicker(ticker);
-        model.addAttribute("stock",stock);
+        if (stock == null) return "error/404";
 
-        ValuationMetric latestMetric = valuationMetricService.getLatestByStock(stock);
-        model.addAttribute("valuationMetric",latestMetric);
+        model.addAttribute("stock",stock);
+        model.addAttribute("valuationMetric", valuationMetricService.getLatestByStock(stock));
 
         boolean isFavorite = false;
         Page<Memo> memoPage = Page.empty();
@@ -47,17 +47,14 @@ public class StockDetailController {
             isFavorite = user.getFavorites().stream()
                     .anyMatch(fav -> fav.getStock().getTicker().equals(ticker));
 
-            Pageable pageable = PageRequest.of(page, 6);
-            memoPage = memoService.getUserMemosByStock(stock.getId(), user.getId() ,pageable);
+            memoPage = memoService.getUserMemosByStock(stock.getId(), user.getId(),
+                    PageRequest.of(page, 6));
         }
 
-        model.addAttribute("isFavorite",isFavorite);
-        model.addAttribute("memoPage",memoPage);
-
-        Map<LocalDate, Map<String, List<Prediction>>> predictionsByDateAndModel =
-                predictionService.getPredictionsGroupedByDateAndModel(stock);
-
-        model.addAttribute("predictionsByDateAndModel", predictionsByDateAndModel);
+        model.addAttribute("isFavorite", isFavorite);
+        model.addAttribute("memoPage", memoPage);
+        model.addAttribute("predictionsByDateAndModel",
+                predictionService.getPredictionsGroupedByDateAndModel(stock));
 
         return "stock-detail";
     }

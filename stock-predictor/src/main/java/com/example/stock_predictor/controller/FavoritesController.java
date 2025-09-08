@@ -30,32 +30,21 @@ public class FavoritesController {
                             @AuthenticationPrincipal UserDetails userDetails,
                             @RequestParam(defaultValue = "0") int page){
         int pageSize = 10;
-        Page<Favorite> favoritesPage = favoriteService.getFavoritesPage(userDetails.getUsername(),page,pageSize);
+
+        if (userDetails == null){
+            model.addAttribute("favorites", List.of());
+            model.addAttribute("currentPage", 0);
+            model.addAttribute("totalPages", 0);
+            return "favorites";
+        }
+
+        Page<Favorite> favoritesPage = favoriteService.getFavoritesPage(userDetails.getUsername(), page, pageSize);
 
         List<StockWithPriceDTO> favoritesDTO = favoritesPage.stream()
-                .map(f -> {
-                    Optional<StockPrice> latestPriceOpt = stockPriceService.getLatestPrice(f.getStock());
-                    BigDecimal price = null, change = null, changePercent = null;
-
-                    if (latestPriceOpt.isPresent()){
-                        StockPrice latestPrice = latestPriceOpt.get();
-                        price = latestPrice.getClosePrice();
-                        changePercent = latestPrice.getChangeRate();
-                        if (price != null && changePercent != null){
-                            change = price.multiply(changePercent).divide(BigDecimal.valueOf(100));
-                        }
-                    }
-
-                    return new StockWithPriceDTO(
-                            f.getStock().getName(),
-                            f.getStock().getTicker(),
-                            f.getStock().getSector(),
-                            f.getStock().getMarket(),
-                            price,
-                            change,
-                            changePercent
-                    );
-                })
+                .map(fav -> favoriteService.toStockWithPriceDTO(
+                        fav,
+                        stockPriceService.getLatestPrice(fav.getStock()).orElse(null)
+                ))
                 .collect(Collectors.toList());
 
         model.addAttribute("favorites", favoritesDTO);
