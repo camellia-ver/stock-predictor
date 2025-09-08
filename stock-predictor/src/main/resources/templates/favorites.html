@@ -77,7 +77,7 @@
                         <span th:if="${stock.changePercent == null}" th:text="'-'"></span>
                     </td>
                     <td class="text-center memo-btn-cell">
-                        <a th:href="@{/memo/{id}(id=${stock.ticker})}"
+                        <a th:href="@{/memo(stockTicker=${stock.ticker})}"
                            class="btn btn-sm btn-outline-primary"
                            onclick="event.stopPropagation()">보기</a>
                     </td>

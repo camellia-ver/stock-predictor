@@ -31,6 +31,7 @@ public class MemoController {
     public String memo(@RequestParam(value = "page", defaultValue = "1") int page,
                        @RequestParam(value = "size", defaultValue = "6") int size,
                        @RequestParam(value = "sort", defaultValue = "latest") String sort,
+                       @RequestParam(value = "stockTicker", required = false) String stockTicker,
                        @AuthenticationPrincipal UserDetails userDetails,
                        Model model){
         User user = userService.getUserByEmail(userDetails.getUsername());
@@ -49,12 +50,19 @@ public class MemoController {
         }
 
         PageRequest pageRequest = PageRequest.of(page - 1, size, sorting);
-        Page<Memo> memoPage = memoService.getMemoByUser(user.getId(), pageRequest);
+        Page<Memo> memoPage;
+
+        if (stockTicker != null){
+            memoPage = memoService.getMemoByUserAndStock(user.getId(), stockTicker, pageRequest);
+        }else {
+            memoPage = memoService.getMemoByUser(user.getId(), pageRequest);
+        }
 
         model.addAttribute("memoList", memoPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", memoPage.getTotalPages());
         model.addAttribute("sort", sort);
+        model.addAttribute("stockTicker", stockTicker);
 
         return "memo";
     }

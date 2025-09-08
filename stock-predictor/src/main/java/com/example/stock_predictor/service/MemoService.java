@@ -79,4 +79,8 @@ public class MemoService {
     public void deleteMemo(Long id){
         memoRepository.deleteById(id);
     }
+
+    public Page<Memo> getMemoByUserAndStock(Long userId, String ticker, Pageable pageable){
+        return memoRepository.findByUserIdAndStock_Ticker(userId, ticker, pageable);
+    }
 }

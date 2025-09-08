@@ -13,4 +13,5 @@ import java.util.Optional;
 public interface MemoRepository extends JpaRepository<Memo, Long> {
     Page<Memo> findByStockIdAndUserIdOrderByCreatedAtDesc(Long stockId, Long userId, Pageable pageable);
     Page<Memo> findByUserId(Long userId, Pageable pageable);
+    Page<Memo> findByUserIdAndStock_Ticker(Long userId, String ticker, Pageable pageable);
 }

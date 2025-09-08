@@ -34,6 +34,9 @@
         <h2>📝 작성 메모</h2>
         <div>
             <a href="/" class="btn btn-outline-light btn-sm me-2">← 대시보드</a>
+            <a th:if="${stockTicker != null}" href="/memo" class="btn btn-outline-light btn-sm">
+                ← 모든 메모 보기
+            </a>
         </div>
     </div>
 
