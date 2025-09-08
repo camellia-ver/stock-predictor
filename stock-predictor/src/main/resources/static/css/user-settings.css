@@ -1,14 +1,27 @@
-        /* 즐겨찾기 추가 버튼 & 입력창 개선 */
-        form.d-flex {
-            gap: 0.5rem; /* 입력창과 버튼 사이 간격 */
-        }
+/* 즐겨찾기 추가 버튼 & 입력창 개선 */
+form.d-flex {
+    gap: 0.5rem; /* 입력창과 버튼 사이 간격 */
+}
 
-        form.d-flex input {
-            flex: 1; /* 입력창이 남은 공간 차지 */
-        }
+form.d-flex input {
+    flex: 1; /* 입력창이 남은 공간 차지 */
+}
 
-        form.d-flex button {
-            flex: none; /* 버튼 너비는 내용만큼 */
-            white-space: nowrap; /* 텍스트 한 줄로 유지 */
-            padding: 0.375rem 0.75rem; /* 적절한 패딩 */
-        }
+form.d-flex button {
+    flex: none; /* 버튼 너비는 내용만큼 */
+    white-space: nowrap; /* 텍스트 한 줄로 유지 */
+    padding: 0.375rem 0.75rem; /* 적절한 패딩 */
+}
+
+#ticker-autocomplete-list {
+    max-height: 200px;    /* 최대 높이 지정 */
+    overflow-y: auto;     /* 넘치면 세로 스크롤 */
+}
+
+#ticker-autocomplete-list li {
+    cursor: pointer;      /* 마우스 올리면 포인터 표시 */
+}
+#ticker-autocomplete-list li.active {
+    background-color: #0d6efd; /* 현재 선택 항목 하이라이트 */
+    color: white;
+}

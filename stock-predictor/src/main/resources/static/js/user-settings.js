@@ -184,15 +184,26 @@ document.addEventListener("DOMContentLoaded", () => {
         const match = value.match(/\((.*?)\)$/);
         const ticker = match ? match[1] : value;
 
-        fetch('/api/favorites/toggle?ticker=' + ticker, { method: 'POST', headers: { [csrfHeader]: csrfToken } })
-            .then(res => res.json())
+        fetch('/api/favorites/toggle?ticker=' + ticker, {
+                method: 'POST',
+                headers: { [csrfHeader]: csrfToken }
+            })
+            .then(res => {
+                if (!res.ok) throw new Error(res.status);
+                return res.json();
+            })
             .then(data => {
-                if (data.isFavorite) {
+                const isFav = data.isFavorite ?? data.favorite;
+
+                if (isFav) {
+                    const nameMatch = value.match(/^(.*)\(/);  // 괄호 전까지 추출
+                    const nameOnly = nameMatch ? nameMatch[1] : value;
+
                     const li = document.createElement('li');
                     li.className = 'list-group-item bg-transparent text-white d-flex justify-content-between align-items-center';
                     li.setAttribute('data-ticker', ticker);
                     li.innerHTML = `
-                        <span>${value}</span>  <!-- name(ticker) 그대로 표시 -->
+                        <span>${nameOnly}</span>
                         <button class="btn btn-sm btn-outline-danger remove-favorite-btn">제거</button>
                     `;
                     favoriteList.appendChild(li);
@@ -202,6 +213,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 } else {
                     alert('이미 즐겨찾기에 있습니다.');
                 }
+
+                tickerInput.value = '';
+                tickerList.innerHTML = '';
+                tickerList.style.display = 'none';
             });
     });
 });
