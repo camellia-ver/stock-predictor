@@ -1,6 +1,7 @@
 package com.example.stock_predictor.service;
 
 import com.example.stock_predictor.dto.MemoDTO;
+import com.example.stock_predictor.exception.ResourceNotFoundException;
 import com.example.stock_predictor.model.Memo;
 import com.example.stock_predictor.model.Stock;
 import com.example.stock_predictor.model.User;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -25,10 +27,10 @@ public class MemoService {
 
     public Memo createMemo(String userEmail, MemoDTO dto){
         User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         Stock stock = stockRepository.findByTicker(dto.getTicker())
-                .orElseThrow(() -> new RuntimeException("Stock not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Stock not found"));
 
         // 제목이 없으면 내용 앞 20자를 자동으로 제목으로 설정
         String finalTitle = (dto.getTitle() == null || dto.getTitle().trim().isEmpty())
@@ -60,23 +62,31 @@ public class MemoService {
 
     public Memo updateMemo(Long id, MemoDTO dto){
         Memo memo = memoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("메모 없음"));
+                .orElseThrow(() -> new ResourceNotFoundException("Memo not found"));
+
+        String newTitle = (dto.getTitle() == null || dto.getTitle().trim().isEmpty())
+                ? memo.getTitle()
+                : dto.getTitle();
+
+        LocalDateTime updatedAt = LocalDateTime.now();
 
         Memo updateMemo = Memo.builder()
                 .id(memo.getId())
-                .title(dto.getTitle())
-                .content(dto.getContent())
-                .createdAt(memo.getCreatedAt())
-                .updatedAt(LocalDateTime.now())
-                .stockDate(memo.getStockDate())
-                .stock(memo.getStock())
                 .user(memo.getUser())
+                .stock(memo.getStock())
+                .title(newTitle)
+                .content(dto.getContent())
+                .stockDate(dto.getStockDate() != null ? dto.getStockDate() : memo.getStockDate())
+                .createdAt(memo.getCreatedAt())
+                .updatedAt(updatedAt)
                 .build();
 
         return memoRepository.save(updateMemo);
     }
 
     public void deleteMemo(Long id){
+        Memo memo = memoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Memo not found"));
         memoRepository.deleteById(id);
     }
 

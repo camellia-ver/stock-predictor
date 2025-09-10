@@ -1,6 +1,7 @@
 package com.example.stock_predictor.controller;
 
 import com.example.stock_predictor.model.Memo;
+import com.example.stock_predictor.model.MemoSort;
 import com.example.stock_predictor.model.User;
 import com.example.stock_predictor.repository.UserRepository;
 import com.example.stock_predictor.service.MemoService;
@@ -34,29 +35,16 @@ public class MemoController {
                        @RequestParam(value = "stockTicker", required = false) String stockTicker,
                        @AuthenticationPrincipal UserDetails userDetails,
                        Model model){
+        if (page < 1) page = 1;
+
         User user = userService.getUserByEmail(userDetails.getUsername());
 
-        Sort sorting;
-        switch (sort) {
-            case "oldest":
-                sorting = Sort.by(Sort.Direction.ASC, "createdAt");
-                break;
-            case "title":
-                sorting = Sort.by(Sort.Direction.ASC, "title");
-                break;
-            case "latest":
-            default:
-                sorting = Sort.by(Sort.Direction.DESC, "createdAt");
-        }
+        MemoSort memoSort = MemoSort.fromString(sort);
+        PageRequest pageRequest = PageRequest.of(page - 1, size, memoSort.getSort());
 
-        PageRequest pageRequest = PageRequest.of(page - 1, size, sorting);
-        Page<Memo> memoPage;
-
-        if (stockTicker != null){
-            memoPage = memoService.getMemoByUserAndStock(user.getId(), stockTicker, pageRequest);
-        }else {
-            memoPage = memoService.getMemoByUser(user.getId(), pageRequest);
-        }
+        Page<Memo> memoPage = (stockTicker != null && !stockTicker.isEmpty())
+                ? memoService.getMemoByUserAndStock(user.getId(), stockTicker, pageRequest)
+                : memoService.getMemoByUser(user.getId(), pageRequest);
 
         model.addAttribute("memoList", memoPage.getContent());
         model.addAttribute("currentPage", page);
