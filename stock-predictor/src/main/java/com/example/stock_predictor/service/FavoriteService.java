@@ -18,13 +18,16 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class FavoriteService {
     private final FavoriteRepository favoriteRepository;
     private final UserService userService;
+    private final StockPriceService stockPriceService;
 
     public Page<Favorite> getFavoritesPage(String email, int page, int size){
         User currentUser = userService.getUserByEmail(email);
@@ -41,6 +44,25 @@ public class FavoriteService {
         }
 
         return currentUser.getFavorites();
+    }
+
+    public List<StockWithPriceDTO> getFavoriteDTOs(String email, int limit){
+        Pageable pageable = PageRequest.of(0, limit);
+        User user = userService.getUserByEmail(email);
+        List<Favorite> favorites = (limit > 0)
+                ? favoriteRepository.findByUserOrderByCreatedAtDesc(user, pageable).getContent()
+                : favoriteRepository.findByUser(user);
+
+        List<String> tickers = favorites.stream()
+                .map(f -> f.getStock().getTicker())
+                .distinct()
+                .toList();
+
+        Map<String, StockPrice> latestPrices = stockPriceService.getLatestPricesForTickers(tickers);
+
+        return favorites.stream()
+                .map(f -> toStockWithPriceDTO(f, latestPrices.get(f.getStock().getTicker())))
+                .collect(Collectors.toList());
     }
 
     @Transactional

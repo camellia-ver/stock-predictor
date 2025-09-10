@@ -1,8 +1,11 @@
 package com.example.stock_predictor.util;
 
+import org.springframework.stereotype.Component;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+@Component
 public class Calculator {
     public record IndexStatus(boolean isRising, BigDecimal rate){}
 

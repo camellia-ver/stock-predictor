@@ -25,62 +25,32 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class HomeController {
     private final StockIndexPriceService stockIndexPriceService;
-    private final StockPriceService stockPriceService;
     private final FavoriteService favoriteService;
+    private final Calculator calculator;
 
     @GetMapping("/")
-    public String home(Model model, Authentication authentication,
-                       @AuthenticationPrincipal UserDetails userDetails) {
-        if (authentication != null && authentication.isAuthenticated() && userDetails != null) {
-            StockIndexPrice kospiPrice = stockIndexPriceService.getLatestIndex("KOSPI");
-            StockIndexPrice kosdaqPrice = stockIndexPriceService.getLatestIndex("KOSDAQ");
-
-            model.addAttribute("kospi", kospiPrice);
-            model.addAttribute("kosdaq", kosdaqPrice);
-
-            Calculator calculator = new Calculator();
-
-            // KOSPI 계산
-            Calculator.IndexStatus kospi = calculator.calculateIndex(kospiPrice.getClosePrice(),kospiPrice.getOpenPrice());
-            model.addAttribute("kospiIsRising", kospi.isRising());
-            model.addAttribute("kospiRate", kospi.rate());
-
-            // KOSDAQ 계산
-            Calculator.IndexStatus kosdaq = calculator.calculateIndex(kosdaqPrice.getClosePrice(),kosdaqPrice.getOpenPrice());
-            model.addAttribute("kosdaqIsRising", kosdaq.isRising());
-            model.addAttribute("kosdaqRate", kosdaq.rate());
-
-            List<Favorite> favorites = favoriteService.getFavoritesLimited(userDetails.getUsername(), true);
-            List<StockWithPriceDTO> favoritesDTO = favorites.stream()
-                    .map(f -> {
-                        Optional<StockPrice> latestPriceOpt = stockPriceService.getLatestPrice(f.getStock());
-                        BigDecimal price = null, change = null, changePercent = null;
-
-                        if (latestPriceOpt.isPresent()){
-                            StockPrice latestPrice = latestPriceOpt.get();
-                            price = latestPrice.getClosePrice();
-                            changePercent = latestPrice.getChangeRate();
-                            if (price != null && changePercent != null){
-                                change = price.multiply(changePercent).divide(BigDecimal.valueOf(100));
-                            }
-                        }
-
-                        return new StockWithPriceDTO(
-                                f.getStock().getName(),
-                                f.getStock().getTicker(),
-                                f.getStock().getSector(),
-                                f.getStock().getMarket(),
-                                price,
-                                change,
-                                changePercent
-                        );
-                    })
-                    .collect(Collectors.toList());
-
-            model.addAttribute("favorites", favoritesDTO);
-
-            return "dashboard";
+    public String home(Model model, @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null){
+            return "intro";
         }
-        return "intro";
+
+        StockIndexPrice kospiPrice = stockIndexPriceService.getLatestIndex("KOSPI");
+        StockIndexPrice kosdaqPrice = stockIndexPriceService.getLatestIndex("KOSDAQ");
+
+        model.addAttribute("kospi", kospiPrice);
+        model.addAttribute("kosdaq", kosdaqPrice);
+
+        var kospiStatus = calculator.calculateIndex(kospiPrice.getClosePrice(), kospiPrice.getOpenPrice());
+        model.addAttribute("kospiIsRising", kospiStatus.isRising());
+        model.addAttribute("kospiRate", kospiStatus.rate());
+
+        var kosdaqStatus = calculator.calculateIndex(kosdaqPrice.getClosePrice(), kosdaqPrice.getOpenPrice());
+        model.addAttribute("kosdaqIsRising", kosdaqStatus.isRising());
+        model.addAttribute("kosdaqRate", kosdaqStatus.rate());
+
+        List<StockWithPriceDTO> favoritesDTO = favoriteService.getFavoriteDTOs(userDetails.getUsername(), 5);
+        model.addAttribute("favorites", favoritesDTO);
+
+        return "dashboard";
     }
 }

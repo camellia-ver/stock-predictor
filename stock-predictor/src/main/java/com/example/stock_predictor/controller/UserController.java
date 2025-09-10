@@ -51,13 +51,12 @@ public class UserController {
 
         model.addAttribute("user",dto);
 
-        List<Favorite> favorites = favoriteService.getFavoritesLimited(userDetails.getUsername(), false);
-        List<FavoriteDTO> favoriteDTO = favorites.stream()
-                        .map(f -> new FavoriteDTO(f.getStock().getName(),f.getStock().getTicker()))
-                                .collect(Collectors.toList());
+        List<StockWithPriceDTO> favorites = favoriteService.getFavoriteDTOs(userDetails.getUsername(), 0);
+        List<FavoriteDTO> favoriteDTOs = favorites.stream()
+                        .map(f -> new FavoriteDTO(f.getName(), f.getTicker()))
+                                .toList();
 
-        System.out.println(favoriteDTO);
-        model.addAttribute("favorites", favoriteDTO);
+        model.addAttribute("favorites", favoriteDTOs);
 
         return "user-settings";
     }

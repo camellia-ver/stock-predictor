@@ -15,4 +15,6 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
     Optional<Favorite> findByUser_UserNameAndStock_Ticker(String userName, String ticker);
     List<Favorite> findTop5ByUserOrderByCreatedAtDesc(User user);
     Page<Favorite> findByUser(User user, Pageable pageable);
+    List<Favorite> findByUser(User user);
+    Page<Favorite> findByUserOrderByCreatedAtDesc(User user, Pageable pageable);
 }
