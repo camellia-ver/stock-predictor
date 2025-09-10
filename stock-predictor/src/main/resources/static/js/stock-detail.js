@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-
     // -------------------- 즐겨찾기 토글 --------------------
     const favBtn = document.querySelector('.favorite-btn');
     if (favBtn) {

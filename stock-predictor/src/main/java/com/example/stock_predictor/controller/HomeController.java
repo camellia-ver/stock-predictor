@@ -2,13 +2,15 @@ package com.example.stock_predictor.controller;
 
 import com.example.stock_predictor.dto.StockWithPriceDTO;
 import com.example.stock_predictor.model.Favorite;
+import com.example.stock_predictor.model.Memo;
 import com.example.stock_predictor.model.StockIndexPrice;
 import com.example.stock_predictor.model.StockPrice;
-import com.example.stock_predictor.service.FavoriteService;
-import com.example.stock_predictor.service.StockIndexPriceService;
-import com.example.stock_predictor.service.StockPriceService;
+import com.example.stock_predictor.service.*;
 import com.example.stock_predictor.util.Calculator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
 public class HomeController {
     private final StockIndexPriceService stockIndexPriceService;
     private final FavoriteService favoriteService;
+    private final MemoService memoService;
     private final Calculator calculator;
 
     @GetMapping("/")
@@ -50,6 +53,10 @@ public class HomeController {
 
         List<StockWithPriceDTO> favoritesDTO = favoriteService.getFavoriteDTOs(userDetails.getUsername(), 5);
         model.addAttribute("favorites", favoritesDTO);
+
+        Long userId = memoService.getUserIdByEmail(userDetails.getUsername());
+        Page<Memo> recentMemos = memoService.getMemoByUser(userId, PageRequest.of(0,5));
+        model.addAttribute("memoList", recentMemos.getContent());
 
         return "dashboard";
     }

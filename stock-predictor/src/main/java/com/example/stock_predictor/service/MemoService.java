@@ -93,4 +93,10 @@ public class MemoService {
     public Page<Memo> getMemoByUserAndStock(Long userId, String ticker, Pageable pageable){
         return memoRepository.findByUserIdAndStock_Ticker(userId, ticker, pageable);
     }
+
+    public Long getUserIdByEmail(String email){
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"))
+                .getId();
+    }
 }
