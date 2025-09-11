@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -23,5 +24,6 @@ public class Role {
     private String name; // 예: "USER", "ADMIN"
 
     @ManyToMany(mappedBy = "roles")
-    private List<User> users;
+    @Builder.Default
+    private List<User> users = new ArrayList<>();
 }

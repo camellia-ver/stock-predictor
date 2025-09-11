@@ -31,10 +31,12 @@ public class User {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Favorite> favorites;
+    @Builder.Default
+    private List<Favorite> favorites = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Memo> notes;
+    @Builder.Default
+    private List<Memo> notes = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.EAGER) // 인증 시 바로 권한을 가져오기 위해 EAGER
     @JoinTable(

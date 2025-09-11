@@ -36,7 +36,11 @@ public class Prediction {
 
     @Override
     public int hashCode() {
-        return Objects.hash(stock.getId(), targetDate, modelName);
+        return Objects.hash(
+                stock != null ? stock.getId() : null,
+                targetDate,
+                modelName
+        );
     }
 
     @Override
@@ -47,8 +51,11 @@ public class Prediction {
 
         Prediction that = (Prediction) obj;
 
-        return stock.getId().equals(that.stock.getId()) &&
-                targetDate.equals(that.targetDate) &&
-                modelName.equals(that.modelName);
+        return Objects.equals(
+                this.stock != null ? this.stock.getId() : null,
+                that.stock != null ? that.stock.getId() : null
+        ) &&
+                Objects.equals(this.targetDate, that.targetDate) &&
+                Objects.equals(this.modelName, that.modelName);
     }
 }

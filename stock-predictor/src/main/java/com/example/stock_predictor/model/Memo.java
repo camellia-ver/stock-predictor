@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "notes")
@@ -43,5 +44,26 @@ public class Memo {
     @PreUpdate
     public void preUpdate(){
         this.updatedAt = LocalDateTime.now();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Memo)) return false;
+
+        Memo that = (Memo) o;
+
+        return Objects.equals(user != null ? user.getId() : null,
+                that.user != null ? that.user.getId() : null) &&
+                Objects.equals(stock != null ? stock.getId() : null,
+                        that.stock != null ? that.stock.getId() : null) &&
+                Objects.equals(stockDate, that.stockDate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(user != null ? user.getId() : null,
+                stock != null ? stock.getId() : null,
+                stockDate);
     }
 }

@@ -33,6 +33,12 @@ public class Stock {
 
     private LocalDate date;
 
-    @OneToMany(mappedBy = "stock", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "stock",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    @Builder.Default
     private List<ValuationMetric> valuationMetrics = new ArrayList<>();
 }
