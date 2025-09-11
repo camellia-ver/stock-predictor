@@ -32,31 +32,6 @@ public class SearchApiController {
 
     @GetMapping("/stocks")
     public  List<StockWithPriceDTO> autocomplete(@RequestParam("query") String query){
-        // 이름 또는 티커로 Stock 검색
-        List<Stock> stocks = searchService.searchStock(query);
-
-        return stocks.stream().map(stock -> {
-            Optional<StockPrice> latestPriceOpt = searchService.searchStockPrice(stock);
-            BigDecimal price = null, change = null, changePercent = null;
-
-            if (latestPriceOpt.isPresent()){
-                StockPrice laestPrice = latestPriceOpt.get();
-                price = laestPrice.getClosePrice();
-                changePercent = laestPrice.getChangeRate();
-                if (price != null && changePercent != null){
-                    change = price.multiply(changePercent).divide(BigDecimal.valueOf(100));
-                }
-            }
-
-            return new StockWithPriceDTO(
-                    stock.getName(),
-                    stock.getTicker(),
-                    stock.getSector(),
-                    stock.getMarket(),
-                    price,
-                    change,
-                    changePercent
-            );
-        }).collect(Collectors.toList());
+        return searchService.searchStockWithPrice(query);
     }
 }
