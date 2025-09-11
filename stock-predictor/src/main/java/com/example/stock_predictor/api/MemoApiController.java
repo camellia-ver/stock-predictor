@@ -27,7 +27,6 @@ public class MemoApiController {
     }
 
     @GetMapping("/{id}")
-    @ResponseBody
     public ResponseEntity<MemoDTO> getMemo(@PathVariable Long id){
         return memoService.getMemoById(id)
                 .map(memo -> ResponseEntity.ok(toDTO(memo)))
