@@ -1,26 +1,19 @@
 package com.example.stock_predictor.controller;
 
 import com.example.stock_predictor.model.Memo;
-import com.example.stock_predictor.model.MemoSort;
+import com.example.stock_predictor.model.enums.MemoSort;
 import com.example.stock_predictor.model.User;
-import com.example.stock_predictor.repository.UserRepository;
 import com.example.stock_predictor.service.MemoService;
 import com.example.stock_predictor.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import java.security.Principal;
-import java.util.List;
 
 @Controller
 @RequiredArgsConstructor

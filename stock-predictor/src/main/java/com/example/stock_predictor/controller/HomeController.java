@@ -1,5 +1,6 @@
 package com.example.stock_predictor.controller;
 
+import com.example.stock_predictor.dto.StockIndexPriceDTO;
 import com.example.stock_predictor.dto.StockWithPriceDTO;
 import com.example.stock_predictor.model.Favorite;
 import com.example.stock_predictor.model.Memo;
@@ -37,8 +38,8 @@ public class HomeController {
             return "intro";
         }
 
-        StockIndexPrice kospiPrice = stockIndexPriceService.getLatestIndex("KOSPI");
-        StockIndexPrice kosdaqPrice = stockIndexPriceService.getLatestIndex("KOSDAQ");
+        StockIndexPriceDTO kospiPrice = stockIndexPriceService.getLatestIndex("KOSPI");
+        StockIndexPriceDTO kosdaqPrice = stockIndexPriceService.getLatestIndex("KOSDAQ");
 
         model.addAttribute("kospi", kospiPrice);
         model.addAttribute("kosdaq", kosdaqPrice);

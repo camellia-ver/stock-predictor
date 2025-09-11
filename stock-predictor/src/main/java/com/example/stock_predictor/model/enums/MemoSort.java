@@ -1,4 +1,4 @@
-package com.example.stock_predictor.model;
+package com.example.stock_predictor.model.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
