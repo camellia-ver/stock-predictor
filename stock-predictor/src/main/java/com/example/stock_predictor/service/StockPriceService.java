@@ -31,7 +31,7 @@ public class StockPriceService {
         }
 
         List<String> distinctTickers = tickers.stream()
-                .filter(Objects::nonNull)
+                .filter(t -> t != null && !t.isBlank())
                 .map(String::trim)
                 .distinct()
                 .toList();
@@ -42,13 +42,13 @@ public class StockPriceService {
 
         List<StockPrice> latestPrices = stockPriceRepository.findLatestByTickersUsingWindow(distinctTickers);
 
-        Map<String, StockPrice> map = new LinkedHashMap<>();
-        for (StockPrice sp : latestPrices){
-            if (sp != null && sp.getStock().getTicker() != null){
-                map.put(sp.getStock().getTicker(),sp);
-            }
-        }
-
-        return map;
+        return latestPrices.stream()
+                .filter(sp -> sp != null && sp.getStock() != null && sp.getStock().getTicker() != null)
+                .collect(Collectors.toMap(
+                        sp -> sp.getStock().getTicker(),
+                        sp -> sp,
+                        (existing, replacement) -> existing,
+                        LinkedHashMap::new
+                ));
     }
 }

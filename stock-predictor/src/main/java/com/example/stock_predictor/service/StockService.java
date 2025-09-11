@@ -3,8 +3,10 @@ package com.example.stock_predictor.service;
 import com.example.stock_predictor.model.Stock;
 import com.example.stock_predictor.repository.StockRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +21,10 @@ public class StockService {
 
     public Stock getStockByTicker(String ticker){
         return stockRepository.findByTicker(ticker)
-                .orElseThrow(() -> new RuntimeException("종목을 찾을 수 없습니다."+ticker));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Stock not found for ticker: " + ticker
+                ));
     }
 
     @Transactional
@@ -62,8 +67,10 @@ public class StockService {
 
         // 2. CSV에 없는 DB 데이터 삭제
         List<Stock> toDelete = dbData.stream()
-                .filter(db -> !csvTickers.contains(db.getTicker()))
+                .filter(db -> csvData.stream()
+                        .noneMatch(csv -> csv.getTicker().equals(db.getTicker())))
                 .toList();
+
         if (!toDelete.isEmpty()) {
             stockRepository.deleteAll(toDelete);
         }

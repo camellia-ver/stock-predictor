@@ -81,8 +81,29 @@ document.addEventListener("DOMContentLoaded", () => {
     async function loadChart(period = "week") {
         const response = await fetch(`/api/stock-prices/${ticker}/prices?period=${period}`);
         const data = await response.json();
-        if (!data || data.length === 0) return;
 
+        // 데이터가 없는 경우 빈 차트 표시
+        if (!data || data.length === 0) {
+            if(chart) chart.destroy();
+            chart = new Chart(ctx, {
+                type: "candlestick",
+                data: {
+                    datasets: [{
+                        label: ticker,
+                        data: [],
+                        color: { up: "rgba(25,190,125,1)", down: "rgba(235,90,90,1)" },
+                        borderColor: "rgba(0,0,0,0.6)"
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+            return;
+        }
+
+        // 데이터가 있는 경우
         const stockName = data[0].name;
         const candles = toCandles(data);
 
@@ -200,10 +221,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // -------------------- 탭 클릭 이벤트 --------------------
     document.querySelectorAll('#chartTab button').forEach(btn=>{
-        btn.addEventListener('click', ()=>{
+        btn.addEventListener('click', async (e)=>{
+            e.preventDefault(); // Bootstrap 탭 기본 이동 방지
             document.querySelectorAll('#chartTab button').forEach(b=>b.classList.remove('active'));
             btn.classList.add('active');
-            loadChart(btn.dataset.period);
+            await loadChart(btn.dataset.period);
         });
     });
 
@@ -212,13 +234,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (memoForm) {
         memoForm.addEventListener("submit", (e) => {
             e.preventDefault();
-
             const content = memoForm.querySelector("textarea").value.trim();
             const title = memoForm.querySelector("input[name='title']").value.trim();
-            if (!content) {
-                alert("메모 내용을 입력하세요.");
-                return;
-            }
+            if (!content) { alert("메모 내용을 입력하세요."); return; }
 
             const ticker = document.getElementById("chartSection").dataset.ticker;
             const stockDate = new Date().toISOString();
@@ -236,21 +254,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 },
                 body: JSON.stringify({ ticker, title, content, stockDate })
             })
-            .then(response => {
-                if (!response.ok) throw new Error("메모 저장 실패");
-                return response.json();
-            })
-            .then(data => {
-                alert("메모가 저장되었습니다!");
-                location.reload();
-            })
+            .then(response => { if (!response.ok) throw new Error("메모 저장 실패"); return response.json(); })
+            .then(data => { alert("메모가 저장되었습니다!"); location.reload(); })
             .catch(err => console.error(err));
         });
     }
 
     // -------------------- textarea 자동 높이 조절 --------------------
-    const textareas = document.querySelectorAll(".memo-box textarea");
-    textareas.forEach(textarea => {
+    document.querySelectorAll(".memo-box textarea").forEach(textarea=>{
         textarea.addEventListener("input", function () {
             this.style.height = "auto";
             this.style.height = this.scrollHeight + "px";
