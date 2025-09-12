@@ -83,7 +83,6 @@ public class UserController {
     @PostMapping("/user/delete")
     public String deleteUserAccount(Authentication auth,
                                     HttpServletRequest request,
-                                    HttpServletResponse response,
                                     RedirectAttributes redirectAttributes){
         User user = userService.getUserByEmail(auth.getName());
         userService.deleteUser(user.getEmail());
