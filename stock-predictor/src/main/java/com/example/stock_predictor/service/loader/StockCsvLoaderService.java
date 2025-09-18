@@ -9,6 +9,8 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -26,6 +28,7 @@ public class StockCsvLoaderService {
     private final StockRepository stockRepository;
     private final EntityManager em;
 
+    @Transactional
     public List<Stock> load(String filePath) throws IOException, CsvValidationException {
         if (!CsvUtils.fileExists(filePath)) {
             log.warn("CSV 파일이 존재하지 않습니다: {}", filePath);

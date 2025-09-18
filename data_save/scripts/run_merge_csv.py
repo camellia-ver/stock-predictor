@@ -8,6 +8,6 @@ if __name__ == '__main__':
     data_dir = os.path.join(parent_dir, 'stock_price_data')
     os.makedirs(data_dir, exist_ok=True)
 
-    df = update_all_with_new_general(data_dir,'korea_stock_index')
+    df = update_all_with_new_general(data_dir,'korea_stock_index_price')
     df = update_all_with_new_general(data_dir,'korea_stock_price')
     df = update_all_with_new_general(data_dir,'korea_valuation')

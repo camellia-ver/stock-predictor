@@ -22,7 +22,7 @@ def update_all_with_new_general(data_dir, file_keyword=""):
     """
     all_pattern = os.path.join(data_dir, f'all_{file_keyword}.csv') if file_keyword else os.path.join(data_dir, 'all_*.csv')
     new_pattern = os.path.join(data_dir, f"new_{file_keyword}_*.csv") if file_keyword else os.path.join(data_dir, "new_*_*.csv")
-
+    
     all_files = glob.glob(all_pattern)
     if not all_files:
         raise FileNotFoundError('기존 all_ 파일이 없습니다.')

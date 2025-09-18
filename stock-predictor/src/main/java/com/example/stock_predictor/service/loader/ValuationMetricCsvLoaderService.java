@@ -12,6 +12,8 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -27,13 +29,13 @@ public class ValuationMetricCsvLoaderService {
     private final StockCacheLoader stockCacheLoader;
     private final EntityManager em;
 
+    @Transactional
     public void load(String filePath) throws IOException, CsvValidationException {
         if (!CsvUtils.fileExists(filePath)) {
             log.warn("CSV 파일이 존재하지 않습니다: {}", filePath);
             return;
         }
 
-        Map<String, Stock> stockCache = stockCacheLoader.loadStockCache(filePath);
         List<ValuationMetric> buffer = new ArrayList<>(BATCH_SIZE);
 
         try (CSVReader reader = CsvUtils.openCsvReader(filePath)) {
@@ -46,23 +48,25 @@ public class ValuationMetricCsvLoaderService {
                 LocalDate date;
                 try { date = LocalDate.parse(cols[0]); } catch (DateTimeParseException e) { continue; }
 
-                Stock stock = stockCache.get(cols[7]);
+                Stock stock = stockCacheLoader.getStock(cols[8]);
                 if (stock == null) continue;
 
-                buffer.add(ValuationMetric.builder()
+                ValuationMetric vm = ValuationMetric.builder()
                         .stock(stock)
                         .date(date)
-                        .roe(NumberParseUtils.parseBigDecimalOrNull(cols[8]))
+                        .roe(NumberParseUtils.parseBigDecimalOrNull(cols[7]))
                         .per(NumberParseUtils.parseBigDecimalOrNull(cols[2]))
                         .pbr(NumberParseUtils.parseBigDecimalOrNull(cols[3]))
                         .eps(NumberParseUtils.parseBigDecimalOrNull(cols[4]))
                         .bps(NumberParseUtils.parseBigDecimalOrNull(cols[1]))
                         .dps(NumberParseUtils.parseBigDecimalOrNull(cols[6]))
                         .dividendYield(NumberParseUtils.parseBigDecimalOrNull(cols[5]))
-                        .build());
+                        .build();
+
+                em.persist(vm);
+                buffer.add(vm);
 
                 if (buffer.size() >= BATCH_SIZE) {
-                    repository.saveAll(buffer);
                     em.flush();
                     em.clear();
                     buffer.clear();
@@ -71,7 +75,6 @@ public class ValuationMetricCsvLoaderService {
         }
 
         if (!buffer.isEmpty()) {
-            repository.saveAll(buffer);
             em.flush();
             em.clear();
             buffer.clear();

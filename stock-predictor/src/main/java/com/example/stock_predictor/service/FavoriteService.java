@@ -36,22 +36,16 @@ public class FavoriteService {
         return favoriteRepository.findByUser(currentUser, pageable);
     }
 
-    public List<Favorite> getFavoritesLimited(String email, boolean limit){
-        User currentUser = userService.getUserByEmail(email);
-
-        if (limit){
-            return favoriteRepository.findTop5ByUserOrderByCreatedAtDesc(currentUser);
-        }
-
-        return currentUser.getFavorites();
-    }
-
     public List<StockWithPriceDTO> getFavoriteDTOs(String email, int limit){
-        Pageable pageable = PageRequest.of(0, limit);
         User user = userService.getUserByEmail(email);
-        List<Favorite> favorites = (limit > 0)
-                ? favoriteRepository.findByUserOrderByCreatedAtDesc(user, pageable).getContent()
-                : favoriteRepository.findByUser(user);
+        List<Favorite> favorites;
+
+        if (limit > 0) {
+            Pageable pageable = PageRequest.of(0, limit);
+            favorites = favoriteRepository.findByUserOrderByCreatedAtDesc(user, pageable).getContent();
+        } else {
+            favorites = favoriteRepository.findByUser(user);
+        }
 
         List<String> tickers = favorites.stream()
                 .map(f -> f.getStock().getTicker())

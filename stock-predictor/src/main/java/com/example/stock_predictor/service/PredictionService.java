@@ -18,7 +18,17 @@ public class PredictionService {
     public Map<LocalDate, Map<String, List<Prediction>>> getPredictionsGroupedByDateAndModel(Stock stock){
         List<Prediction> predictions = predictionRepository.findByStockOrderByTargetDateAsc(stock);
 
+        LocalDate latestPredictionDate = predictions.stream()
+                .map(Prediction::getPredictionDate)
+                .max(LocalDate::compareTo)
+                .orElse(null);
+
+        if (latestPredictionDate == null) {
+            return Collections.emptyMap();
+        }
+
         return predictions.stream()
+                .filter(p -> p.getPredictionDate().equals(latestPredictionDate))
                 .collect(Collectors.groupingBy(
                         Prediction::getTargetDate,
                         TreeMap::new,

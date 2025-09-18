@@ -16,7 +16,7 @@ DATA_PATH =  os.path.join(current_dir, "..", "data", "dataset_base.parquet")
 NEW_DATA_PATH = os.path.join(current_dir, "..", "data", "new_data.parquet")
 DATA_DIR_PATH = os.path.join(current_dir,'..','data')
 
-SQL_PATH = 'sql/build_dataset.sql'
-NEW_SQL_PATH = 'sql/build_new_data.sql'
+SQL_PATH = os.path.join(current_dir,'sql','build_dataset.sql')
+NEW_SQL_PATH = os.path.join(current_dir,'sql','build_new_data.sql') 
 
 CSV_PATH = os.path.join(current_dir, "..", "result_data", f"predictions_{datetime.now().strftime('%Y_%m_%d')}.csv")

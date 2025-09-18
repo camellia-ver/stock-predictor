@@ -12,6 +12,8 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -27,13 +29,13 @@ public class StockPriceCsvLoaderService {
     private final StockPriceRepository stockPriceRepository;
     private final EntityManager em;
 
+    @Transactional
     public void load(String filePath) throws IOException, CsvValidationException {
         if (!CsvUtils.fileExists(filePath)) {
             log.warn("CSV 파일이 존재하지 않습니다: {}", filePath);
             return;
         }
 
-        Map<String, Stock> stockCache = stockCacheLoader.loadStockCache(filePath);
         List<StockPrice> buffer = new ArrayList<>(BATCH_SIZE);
 
         try (CSVReader reader = CsvUtils.openCsvReader(filePath)) {
@@ -46,7 +48,7 @@ public class StockPriceCsvLoaderService {
                 LocalDate date;
                 try { date = LocalDate.parse(cols[0]); } catch (DateTimeParseException e) { continue; }
 
-                Stock stock = stockCache.get(cols[7]);
+                Stock stock = stockCacheLoader.getStock(cols[7]);
                 if (stock == null) continue;
 
                 buffer.add(StockPrice.builder()
