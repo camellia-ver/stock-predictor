@@ -33,3 +33,14 @@ Python 라이브러리를 통해 과거 주식 데이터를 자동 수집·가�
 ## 🏗️ 아키텍처
 <img width="635" height="716" alt="image" src="https://github.com/user-attachments/assets/ad5830d8-831d-42e9-b5e1-bc4c09f3f32d" />
 
+---
+## 📸 Screenshots
+### 머신러닝 예측 모델
+<img width="1648" height="667" alt="머신러닝_예측모델" src="https://github.com/user-attachments/assets/35f63ef0-7c94-4d7d-b71d-01c5b896614a" />
+
+### 즐겨찾기
+<img width="825" height="451" alt="즐겨찾기3" src="https://github.com/user-attachments/assets/e6504445-3cc2-486b-ba6c-1e60fd66d948" />
+<img width="1702" height="551" alt="즐겨찾기" src="https://github.com/user-attachments/assets/74b07865-88fb-4ee1-998d-a0155948b390" />
+
+### 메모
+<img width="1695" height="622" alt="메모" src="https://github.com/user-attachments/assets/8d421fc8-6afd-4212-9161-d37c3b9de32f" />
