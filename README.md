@@ -29,3 +29,7 @@ Python 라이브러리를 통해 과거 주식 데이터를 자동 수집·가�
 | **Data Processing & AI Model** | Python (`Pandas`, `scikit-learn`, `pykrx`) |
 | **ORM** | Spring Data JPA (Hibernate) |
 | **Visualization**  | Chart.js |
+---
+## 🏗️ 아키텍처
+<img width="635" height="716" alt="image" src="https://github.com/user-attachments/assets/ad5830d8-831d-42e9-b5e1-bc4c09f3f32d" />
+
